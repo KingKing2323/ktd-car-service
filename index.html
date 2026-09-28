@@ -1342,6 +1342,45 @@
     <span id="toast-msg">ข้อความ</span>
   </div>
 
+  <!-- ⚡ INSTANT PRE-PAINT ROUTER (ป้องกันจอขาว & สลับหน้าทันทีเสี้ยววินาทีแรก 100%) -->
+  <script>
+    (function() {
+      try {
+        var p = 'request';
+        var q = window.location.search;
+        if (q) {
+          var m = q.match(/[?&]page=([a-zA-Z0-9_-]+)/);
+          if (m && m[1]) p = m[1];
+        }
+        if (window.location.hash) {
+          var h = window.location.hash.replace(/^#/, '');
+          if (h.indexOf('page=') !== -1) {
+            p = h.split('page=')[1].split('&')[0];
+          } else if (h) {
+            p = h.replace(/^\//, '').split('?')[0];
+          }
+        }
+        var sec = document.getElementById('page-' + p);
+        if (sec) {
+          sec.classList.remove('hidden');
+        } else {
+          var defSec = document.getElementById('page-request');
+          if (defSec) defSec.classList.remove('hidden');
+        }
+        var btn = document.getElementById('tab-' + p);
+        if (btn) {
+          var allTabs = document.querySelectorAll('header div button[id^="tab-"]');
+          for (var i = 0; i < allTabs.length; i++) {
+            allTabs[i].classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+            allTabs[i].classList.add('bg-slate-800', 'text-slate-300');
+          }
+          btn.classList.remove('bg-slate-800', 'text-slate-300');
+          btn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <!-- SCRIPT LOGIC -->
   <script>
     // State Variables
@@ -1390,7 +1429,7 @@
           const p = hash.split('=')[1].trim();
           if (known.includes(p)) return p;
         }
-        const cleanHash = hash.replace(/^//, '').split('?')[0];
+        const cleanHash = hash.replace(/^\//, '').split('?')[0];
         if (known.includes(cleanHash)) return cleanHash;
       }
 
