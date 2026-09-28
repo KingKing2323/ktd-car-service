@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ระบบบริหารจัดการยานพาหนะ ฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย</title>
+  <!-- Google Fonts: Prompt & Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Kanit:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+            heading: ['Kanit', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              300: '#fdba74',
+              400: '#fb923c',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+              800: '#9a3412',
+              900: '#7c2d12'
+            },
+            slate: {
+              850: '#151f32',
+              900: '#0f172a',
+              950: '#090d16'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      background-color: #f8fafc;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .badge-pulse {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-20 text-slate-800 bg-slate-50 antialiased">
+
+  <!-- TOP APP BAR -->
+  <header class="sticky top-0 z-40 bg-slate-900 text-white shadow-md border-b border-slate-800">
+    <div class="max-w-4xl mx-auto px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('request')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
+          <i class="fa-solid fa-van-shuttle text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-sm font-bold tracking-tight text-white leading-tight font-heading">ฝ่ายพัฒนาชุมชนฯ</h1>
+            <span id="role-badge" class="px-2 py-0.5 text-[10px] font-semibold bg-brand-500/20 text-brand-300 border border-brand-500/30 rounded-full">One Stop Service</span>
+          </div>
+          <p class="text-[11px] text-slate-400">สำนักงานเขตคลองเตย</p>
+        </div>
+      </div>
+
+      <!-- User Info & Action Buttons -->
+      <div class="flex items-center space-x-2">
+        <div id="user-display" class="hidden sm:flex flex-col text-right">
+          <span id="display-user-name" class="text-xs font-semibold text-slate-200">ผู้ใช้งาน</span>
+          <span id="display-user-role" class="text-[10px] text-brand-400">สมาชิก</span>
+        </div>
+        <button id="btn-admin-logout" onclick="logoutAdmin()" class="hidden px-2.5 py-1 text-xs bg-rose-600/80 hover:bg-rose-600 text-white rounded-lg transition items-center space-x-1">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span class="hidden md:inline">ออกระบบ</span>
+        </button>
+        <button onclick="closeLiffWindow()" title="ปิดหน้าต่าง" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- HORIZONTAL NAVIGATION TABS -->
+    <div class="max-w-4xl mx-auto px-3 pb-2 overflow-x-auto hide-scrollbar flex space-x-1.5 border-t border-slate-800/80 pt-2 text-xs font-medium">
+      <!-- Requester & General -->
+      <button onclick="switchTab('request')" id="tab-request" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-brand-600 text-white shadow-sm flex items-center space-x-1.5">
+        <i class="fa-solid fa-car-side"></i> <span>ขอใช้รถ (ในฝ่าย)</span>
+      </button>
+      <button onclick="switchTab('borrow')" id="tab-borrow" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1.5">
+        <i class="fa-solid fa-arrows-split-up-and-left"></i> <span>ยืมรถ (ข้ามฝ่าย 9 ฝ่าย)</span>
+      </button>
+      <button onclick="switchTab('my_requests')" id="tab-my_requests" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1.5">
+        <i class="fa-solid fa-clipboard-list"></i> <span>คำขอของฉัน</span>
+      </button>
+      <button onclick="switchTab('queue')" id="tab-queue" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1.5">
+        <i class="fa-solid fa-calendar-day"></i> <span>ตารางคิวรถ</span>
+      </button>
+
+      <!-- Admin Specific -->
+      <button onclick="switchTab('admin_dashboard')" id="tab-admin_dashboard" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 flex items-center space-x-1.5">
+        <i class="fa-solid fa-crown text-amber-400"></i> <span>Admin Dashboard</span>
+      </button>
+
+      <!-- Driver Specific -->
+      <button onclick="switchTab('mileage')" id="tab-mileage" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1.5">
+        <i class="fa-solid fa-gauge-high"></i> <span>บันทึกไมล์ แบบ 4</span>
+      </button>
+      <button onclick="switchTab('fuel')" id="tab-fuel" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1.5">
+        <i class="fa-solid fa-gas-pump"></i> <span>เติมน้ำมัน</span>
+      </button>
+      <button onclick="switchTab('repair')" id="tab-repair" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1.5">
+        <i class="fa-solid fa-wrench"></i> <span>แจ้งซ่อม</span>
+      </button>
+
+      <!-- Common info -->
+      <button onclick="switchTab('roster')" id="tab-roster" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1.5">
+        <i class="fa-solid fa-address-book"></i> <span>ทำเนียบ พขร.</span>
+      </button>
+      <button onclick="switchTab('register')" id="tab-register" class="px-3 py-1.5 rounded-full whitespace-nowrap transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center space-x-1.5">
+        <i class="fa-solid fa-user-gear"></i> <span>ลงทะเบียน</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-4xl mx-auto px-4 pt-4">
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 1: ADMIN LOGIN (สำหรับเข้าผ่านคอมพิวเตอร์ / บราวเซอร์) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-admin_login" class="hidden max-w-md mx-auto py-8">
+      <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-center text-white">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-3 text-3xl">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h2 class="text-xl font-bold font-heading">เข้าสู่ระบบผู้จัดคิวรถ (Admin)</h2>
+          <p class="text-xs text-slate-300 mt-1">ฝ่ายพัฒนาชุมชนและสวัสดิการสังคม สำนักงานเขตคลองเตย</p>
+        </div>
+
+        <form id="form-admin-login" onsubmit="handleAdminLogin(event)" class="p-6 space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">LINE User ID</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-brands fa-line text-green-500"></i></span>
+              <input type="text" id="login-uid" required placeholder="Uef13b85cf7b1e5edfa50d2c1829e988b" class="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">รหัส PIN 6 หลัก</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-key text-amber-500"></i></span>
+              <input type="password" id="login-pin" maxlength="6" pattern="\d{6}" required placeholder="••••••" class="w-full pl-9 pr-3 py-2.5 text-sm tracking-widest bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">* หากยังไม่เคยตั้ง PIN ให้ใช้รหัสเริ่มต้น 123456</p>
+          </div>
+
+          <button type="submit" id="btn-login-submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>เข้าสู่ระบบหลังบ้าน</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 2: ADMIN DASHBOARD (จัดคิวรอบเดียว & จัดการ 3 สถานการณ์) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-admin_dashboard" class="hidden space-y-4">
+      <!-- Dashboard Top Header Bar -->
+      <div class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 rounded-2xl p-4 sm:p-5 text-white shadow-lg border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg">👑 ADMIN DASHBOARD</span>
+              <span id="dash-date-badge" class="text-xs text-slate-300">วันพรุ่งนี้</span>
+            </div>
+            <h2 id="dash-date-thai" class="text-lg sm:text-xl font-bold font-heading text-white mt-1">กำลังโหลดข้อมูล...</h2>
+          </div>
+
+          <!-- Date Selector & Action Tools -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative">
+              <input type="date" id="dash-date-input" onchange="loadAdminDashboard()" class="text-xs font-medium bg-slate-800 text-white border border-slate-700 rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <button onclick="openUrgentModal()" class="px-3 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-sm transition flex items-center space-x-1.5">
+              <i class="fa-solid fa-plus-circle"></i>
+              <span>เพิ่มด่วน</span>
+            </button>
+            <button onclick="loadAdminDashboard()" class="p-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition" title="รีเฟรช">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Summary Stat Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4 pt-4 border-t border-slate-800 text-center">
+          <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/60">
+            <span class="text-[11px] text-slate-400">คำขอทั้งหมด</span>
+            <p id="stat-total" class="text-lg font-bold text-white font-heading">0</p>
+          </div>
+          <div class="bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
+            <span class="text-[11px] text-amber-300">⏳ รอจัดคิว/อนุมัติ</span>
+            <p id="stat-pending" class="text-lg font-bold text-amber-400 font-heading">0</p>
+          </div>
+          <div class="bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/20">
+            <span class="text-[11px] text-emerald-300">✅ ประกาศแล้ว</span>
+            <p id="stat-announced" class="text-lg font-bold text-emerald-400 font-heading">0</p>
+          </div>
+          <div class="bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/20">
+            <span class="text-[11px] text-rose-300">⚠️ ค้างส่งใบใช้รถ</span>
+            <p id="stat-pending-doc" class="text-lg font-bold text-rose-400 font-heading">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Announcement Toolbar -->
+      <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="check-select-all" onchange="toggleSelectAllRequests(this.checked)" class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500">
+          <label for="check-select-all" class="text-xs font-semibold text-slate-700 cursor-pointer">เลือกทั้งหมด (<span id="selected-count">0</span> รายการ)</label>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="handleBatchAnnounce()" id="btn-batch-announce" class="px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-xl shadow-md shadow-brand-500/20 transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>📢 ประกาศและแจ้งผลรอบเดียว</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- PENDING REQUESTS LIST (Section A: Assign First) -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+            <span>รายการคำขอรอจัดสรรคิวรถ</span>
+          </h3>
+          <span class="text-xs text-slate-500">จัดสรรรถ + พขร. ให้ครบ แล้วกดประกาศ</span>
+        </div>
+
+        <div id="admin-pending-list" class="space-y-2.5">
+          <!-- Pending request cards injected dynamically -->
+          <div class="text-center py-8 text-slate-400 text-xs">กำลังโหลดคำขอ...</div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCED / QUEUE LIST (Section B: Already Announced) -->
+      <div class="space-y-3 pt-3">
+        <div class="flex items-center justify-between px-1">
+          <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+            <span>คิวรถที่ประกาศผลแล้ว (ปรับปรุงตาราง/ยกเลิกได้)</span>
+          </h3>
+          <span class="text-xs text-slate-500">สถานะ: ล็อก (แก้ไขจะแจ้งเตือนซ้ำ)</span>
+        </div>
+
+        <div id="admin-announced-list" class="space-y-2.5">
+          <!-- Announced request cards injected dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 3: REQUEST (ยื่นคำขอใช้รถภายในฝ่ายพัฒนาชุมชนฯ) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-request" class="space-y-4">
+      <div class="bg-gradient-to-r from-brand-600 to-amber-600 rounded-2xl p-4 sm:p-5 text-white shadow-lg shadow-brand-500/15">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white text-2xl">
+            <i class="fa-solid fa-car-side"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold font-heading">ยื่นขอใช้รถราชการ (ภายในฝ่าย)</h2>
+            <p class="text-xs text-brand-100">ฝ่ายพัฒนาชุมชนและสวัสดิการสังคม สำนักงานเขตคลองเตย</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <form id="form-request" onsubmit="handleRequestSubmit(event)" class="space-y-4 text-xs">
+          <!-- Hidden User ID -->
+          <input type="hidden" id="req-user-id">
+
+          <!-- Section: ผู้ขอ -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ชื่อผู้ขอใช้รถ <span class="text-rose-500">*</span></label>
+              <input type="text" id="req-name" required placeholder="เช่น พี่ขวัญ (นางสาวสุพัตรา) หรือชื่อเต็ม" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">จำนวนผู้โดยสาร (คน) <span class="text-rose-500">*</span></label>
+              <input type="number" id="req-passengers" min="1" max="15" value="1" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Section: วันเวลา -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">วันที่ต้องการใช้รถ <span class="text-rose-500">*</span></label>
+              <input type="date" id="req-date" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">เวลาไป <span class="text-rose-500">*</span></label>
+              <input type="time" id="req-time-start" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">เวลากลับ <span class="text-rose-500">*</span></label>
+              <input type="time" id="req-time-end" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
+            </div>
+          </div>
+
+          <!-- Section: สถานที่และวัตถุประสงค์ -->
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">สถานที่ปลายทาง <span class="text-rose-500">*</span></label>
+            <input type="text" id="req-destination" required placeholder="เช่น ศาลาว่าการ กทม. 2 (ดินแดง) หรือ ชุมชนหมู่บ้านพัฒนา" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">วัตถุประสงค์ในการเดินทาง <span class="text-rose-500">*</span></label>
+            <input type="text" id="req-purpose" required placeholder="เช่น เข้าร่วมประชุมคณะกรรมการ หรือ ส่งมอบถุงยังชีพ" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">รายชื่อผู้ร่วมเดินทาง (ถ้ามี)</label>
+            <input type="text" id="req-passenger-list" placeholder="ระบุชื่อเจ้าหน้าที่ร่วมเดินทาง" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+
+          <!-- Section: เอกสารใบขอใช้รถ -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+            <span class="block font-semibold text-slate-800">📄 ใบขอใช้รถราชการ (แบบ 3)</span>
+            <div class="flex items-center space-x-2">
+              <input type="checkbox" id="req-pending-doc" onchange="togglePendingDoc(this.checked)" class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500">
+              <label for="req-pending-doc" class="text-xs text-slate-600 cursor-pointer font-medium">ขอค้างส่งใบใช้รถไว้ก่อน (จะนำส่งให้ผู้จัดคิวภายหลัง)</label>
+            </div>
+            <div id="req-file-box" class="space-y-1">
+              <label class="block text-[11px] text-slate-500">แนบรูปถ่ายใบขอใช้รถ (ถ้ามี):</label>
+              <input type="file" id="req-doc-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+            </div>
+          </div>
+
+          <button type="submit" id="btn-request-submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2 text-sm">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>ส่งคำขอใช้รถราชการ</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 4: BORROW (ขอยืมรถราชการข้ามฝ่าย — สำหรับ 9 ฝ่าย) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-borrow" class="hidden space-y-4">
+      <div class="bg-gradient-to-r from-sky-600 to-indigo-600 rounded-2xl p-4 sm:p-5 text-white shadow-lg shadow-sky-500/15">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white text-2xl">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold font-heading">ขอยืมรถราชการ (ข้ามฝ่าย)</h2>
+            <p class="text-xs text-sky-100">สำหรับ 9 ฝ่ายสังกัดสำนักงานเขตคลองเตย</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <form id="form-borrow" onsubmit="handleBorrowSubmit(event)" class="space-y-4 text-xs">
+          <!-- Hidden User ID -->
+          <input type="hidden" id="borrow-user-id">
+
+          <!-- Section: ฝ่ายและข้อมูลผู้ขอ -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ฝ่ายสังกัดของผู้ยืม <span class="text-rose-500">*</span></label>
+              <select id="borrow-dept" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium">
+                <option value="">-- กรุณาเลือกฝ่าย --</option>
+                <option value="ฝ่ายปกครอง">ฝ่ายปกครอง</option>
+                <option value="ฝ่ายทะเบียน">ฝ่ายทะเบียน</option>
+                <option value="ฝ่ายโยธา">ฝ่ายโยธา</option>
+                <option value="ฝ่ายสิ่งแวดล้อมและสุขาภิบาล">ฝ่ายสิ่งแวดล้อมและสุขาภิบาล</option>
+                <option value="ฝ่ายรายได้">ฝ่ายรายได้</option>
+                <option value="ฝ่ายการคลัง">ฝ่ายการคลัง</option>
+                <option value="ฝ่ายการศึกษา">ฝ่ายการศึกษา</option>
+                <option value="ฝ่ายรักษาความสะอาดและสวนสาธารณะ">ฝ่ายรักษาความสะอาดและสวนสาธารณะ</option>
+                <option value="ฝ่ายเทศกิจ">ฝ่ายเทศกิจ</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ชื่อหัวหน้าฝ่ายผู้ยืม</label>
+              <input type="text" id="borrow-dept-head" placeholder="ระบุชื่อหัวหน้าฝ่ายของท่าน" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ชื่อผู้ขอ <span class="text-rose-500">*</span></label>
+              <input type="text" id="borrow-first-name" required placeholder="ชื่อ" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">นามสกุล <span class="text-rose-500">*</span></label>
+              <input type="text" id="borrow-last-name" required placeholder="นามสกุล" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ตำแหน่ง</label>
+              <input type="text" id="borrow-position" placeholder="เช่น เจ้าพนักงานปกครองปฏิบัติการ" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ <span class="text-rose-500">*</span></label>
+              <input type="tel" id="borrow-phone" required placeholder="08x-xxx-xxxx" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">จำนวนผู้โดยสาร (คน) <span class="text-rose-500">*</span></label>
+              <input type="number" id="borrow-passengers" min="1" max="15" value="1" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Section: วันเวลาและเส้นทาง -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">วันที่ต้องการใช้รถ <span class="text-rose-500">*</span></label>
+              <input type="date" id="borrow-date" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">เวลาไป <span class="text-rose-500">*</span></label>
+              <input type="time" id="borrow-time-start" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">เวลากลับ <span class="text-rose-500">*</span></label>
+              <input type="time" id="borrow-time-end" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">สถานที่ปลายทาง <span class="text-rose-500">*</span></label>
+            <input type="text" id="borrow-destination" required placeholder="ระบุสถานที่ปลายทาง" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">วัตถุประสงค์ในการยืมรถ <span class="text-rose-500">*</span></label>
+            <input type="text" id="borrow-purpose" required placeholder="ระบุวัตถุประสงค์ของภารกิจ" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          </div>
+
+          <!-- Section: ขอยืม พขร. -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <div>
+              <label class="block font-semibold text-slate-800 mb-1">ต้องการพนักงานขับรถยนต์ (พขร.) หรือไม่? <span class="text-rose-500">*</span></label>
+              <div class="flex items-center space-x-4">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="radio" name="borrow-need-driver" value="yes" checked onchange="toggleDriverSelect(true)" class="text-sky-600 focus:ring-sky-500">
+                  <span class="text-xs font-medium text-slate-700">ต้องการ พขร. ปฏิบัติหน้าที่</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input type="radio" name="borrow-need-driver" value="no" onchange="toggleDriverSelect(false)" class="text-sky-600 focus:ring-sky-500">
+                  <span class="text-xs font-medium text-slate-700">ไม่ต้องการ (ฝ่ายผู้ยืมขับเอง)</span>
+                </label>
+              </div>
+            </div>
+
+            <div id="box-specified-driver">
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">พขร. ที่ประสงค์ระบุ (ถ้ามี):</label>
+              <select id="borrow-specified-driver" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none font-medium">
+                <option value="ไม่ระบุ (ผู้จัดคิวรถจะเป็นคนเลือกให้)">ไม่ระบุ (ผู้จัดคิวรถจะเป็นคนเลือกให้)</option>
+                <option value="นายสามารถ สร้อยสูงเนิน (พี่มาด)">นายสามารถ สร้อยสูงเนิน (พี่มาด)</option>
+                <option value="นายรณกร เจตน์ณิชากร (พี่เก่ง)">นายรณกร เจตน์ณิชากร (พี่เก่ง)</option>
+                <option value="นายเกรียงไกร บุรมโคตร (พี่โย)">นายเกรียงไกร บุรมโคตร (พี่โย)</option>
+                <option value="นายกิตติ ชมสมุท (พี่ดิ่ง)">นายกิตติ ชมสมุท (พี่ดิ่ง)</option>
+              </select>
+              <p class="text-[11px] text-slate-400 mt-1">* หมายเหตุ: ผู้จัดคิวรถอาจมีการปรับเปลี่ยน พขร. ตามความเหมาะสมของภารกิจ</p>
+            </div>
+          </div>
+
+          <!-- Section: เอกสารใบขอใช้รถ -->
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+            <span class="block font-semibold text-slate-800">📄 ใบขอใช้รถราชการของฝ่ายผู้ยืม</span>
+            <div class="flex items-center space-x-2">
+              <input type="checkbox" id="borrow-pending-doc" onchange="toggleBorrowPendingDoc(this.checked)" class="w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500">
+              <label for="borrow-pending-doc" class="text-xs text-slate-600 cursor-pointer font-medium">ขอค้างส่งใบใช้รถไว้ก่อน (จะนำส่งให้ภายใน 24 ชม.)</label>
+            </div>
+            <div id="borrow-file-box" class="space-y-1">
+              <label class="block text-[11px] text-slate-500">แนบรูปถ่ายใบขอใช้รถที่หัวหน้าฝ่ายลงนามแล้ว:</label>
+              <input type="file" id="borrow-doc-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+            </div>
+          </div>
+
+          <button type="submit" id="btn-borrow-submit" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-xl shadow-lg shadow-sky-500/25 transition flex items-center justify-center space-x-2 text-sm">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>ยื่นคำขอยืมรถราชการ</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 5: MY REQUESTS (คำขอของฉัน & ติดตามสถานะ) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-my_requests" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold font-heading text-slate-800">📋 คำขอใช้รถของฉัน</h2>
+          <p class="text-xs text-slate-500">ตรวจสอบสถานะการจัดคิว และยกเลิกคำขอที่รออนุมัติ</p>
+        </div>
+        <button onclick="loadMyRequests()" class="px-3 py-1.5 text-xs bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl transition flex items-center space-x-1 shadow-sm">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>รีเฟรช</span>
+        </button>
+      </div>
+
+      <div id="my-requests-list" class="space-y-3">
+        <!-- Requests injected dynamically -->
+        <div class="text-center py-12 text-slate-400 text-xs">
+          <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-slate-300"></i>
+          <p>กำลังค้นหาคำขอของคุณ...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 6: QUEUE (ตารางคิวรถราชการประจำวัน) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-queue" class="hidden space-y-4">
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold font-heading text-slate-900">📅 ตารางคิวรถราชการประจำวัน</h2>
+          <p id="queue-date-label" class="text-xs text-brand-600 font-medium">กำลังโหลดข้อมูล...</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <input type="date" id="queue-date-input" onchange="loadQueueData()" class="text-xs font-medium px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          <button onclick="loadQueueData()" class="px-3 py-2 text-xs bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="queue-items-container" class="space-y-2.5">
+        <!-- Injected dynamically -->
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 7: MILEAGE (บันทึกเลขไมล์ แบบ 4 สำหรับ พขร.) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-mileage" class="hidden space-y-4">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 sm:p-5 text-white shadow-lg shadow-blue-500/15">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white text-2xl">
+            <i class="fa-solid fa-gauge-high"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold font-heading">บันทึกเลขไมล์ (แบบ 4)</h2>
+            <p class="text-xs text-blue-100">แบบฟอร์มควบคุมการใช้งานรถราชการ</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <form id="form-mileage" onsubmit="handleMileageSubmit(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ทะเบียนรถราชการ <span class="text-rose-500">*</span></label>
+            <select id="mileage-plate" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold text-slate-800">
+              <option value="ฮพ 9760">ฮพ 9760 — Toyota Commuter ตู้ 1 / Food Bank (พี่เก่ง)</option>
+              <option value="ฮพ 9630">ฮพ 9630 — Toyota Commuter ตู้ 2 (พี่ดิ่ง)</option>
+              <option value="ฮร 3389">ฮร 3389 — Isuzu Spark สองแถว (พี่โย)</option>
+              <option value="ฏห 4265">ฏห 4265 — Chevrolet Colorado กระบะ 4 ประตู (พี่มาด)</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ช่วงเวลาบันทึก <span class="text-rose-500">*</span></label>
+              <select id="mileage-period" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none font-medium">
+                <option value="ก่อนออกเดินทาง">ก่อนออกเดินทาง (กม. เริ่มต้น)</option>
+                <option value="หลังกลับถึงเขต">หลังกลับถึงเขต (กม. สิ้นสุด)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">เลขไมล์หน้าปัด (กิโลเมตร) <span class="text-rose-500">*</span></label>
+              <input type="number" id="mileage-val" required placeholder="เช่น 124500" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-base font-bold text-slate-900 tracking-wider">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ชื่อ พขร. ผู้บันทึก <span class="text-rose-500">*</span></label>
+            <input type="text" id="mileage-driver" required placeholder="ระบุชื่อ พขร." class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ถ่ายรูปหน้าปัดไมล์รถ</label>
+            <input type="file" id="mileage-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          </div>
+
+          <button type="submit" id="btn-mileage-submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition flex items-center justify-center space-x-2 text-sm">
+            <i class="fa-solid fa-check-circle"></i>
+            <span>บันทึกเลขไมล์ (แบบ 4)</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 8: FUEL (บันทึกเติมน้ำมัน) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-fuel" class="hidden space-y-4">
+      <div class="bg-gradient-to-r from-amber-600 to-yellow-600 rounded-2xl p-4 sm:p-5 text-white shadow-lg shadow-amber-500/15">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white text-2xl">
+            <i class="fa-solid fa-gas-pump"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold font-heading">บันทึกการเติมน้ำมันเชื้อเพลิง</h2>
+            <p class="text-xs text-amber-100">โควตา 247 ลิตร/คัน/เดือน</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <form id="form-fuel" onsubmit="handleFuelSubmit(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ทะเบียนรถราชการ <span class="text-rose-500">*</span></label>
+            <select id="fuel-plate" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-semibold text-slate-800">
+              <option value="ฮพ 9760">ฮพ 9760 — Toyota Commuter ตู้ 1 / Food Bank (พี่เก่ง)</option>
+              <option value="ฮพ 9630">ฮพ 9630 — Toyota Commuter ตู้ 2 (พี่ดิ่ง)</option>
+              <option value="ฮร 3389">ฮร 3389 — Isuzu Spark สองแถว (พี่โย)</option>
+              <option value="ฏห 4265">ฏห 4265 — Chevrolet Colorado กระบะ 4 ประตู (พี่มาด)</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">สถานีบริการ/ปั๊มน้ำมัน <span class="text-rose-500">*</span></label>
+              <input type="text" id="fuel-station" required value="ปตท." class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ปริมาณน้ำมัน (ลิตร) <span class="text-rose-500">*</span></label>
+              <input type="number" step="0.01" id="fuel-liters" required placeholder="เช่น 45.50" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none text-base font-bold text-slate-900">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">เลขไมล์ขณะเติม (กิโลเมตร)</label>
+              <input type="number" id="fuel-mileage" placeholder="เช่น 124500" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ชื่อผู้เติม <span class="text-rose-500">*</span></label>
+              <input type="text" id="fuel-driver" required placeholder="ระบุชื่อผู้เติม" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">รูปถ่ายบิลหรือใบเสร็จน้ำมัน</label>
+            <input type="file" id="fuel-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+          </div>
+
+          <button type="submit" id="btn-fuel-submit" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl shadow-lg shadow-amber-500/25 transition flex items-center justify-center space-x-2 text-sm">
+            <i class="fa-solid fa-check-circle"></i>
+            <span>บันทึกการเติมน้ำมัน</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 9: REPAIR (แจ้งซ่อมบำรุง) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-repair" class="hidden space-y-4">
+      <div class="bg-gradient-to-r from-rose-600 to-red-600 rounded-2xl p-4 sm:p-5 text-white shadow-lg shadow-rose-500/15">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white text-2xl">
+            <i class="fa-solid fa-wrench"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold font-heading">แจ้งซ่อมบำรุงยานพาหนะ</h2>
+            <p class="text-xs text-rose-100">รายงานอาการผิดปกติเพื่อประสานงานซ่อมแซม</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <form id="form-repair" onsubmit="handleRepairSubmit(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ทะเบียนรถที่พบปัญหา <span class="text-rose-500">*</span></label>
+            <select id="repair-plate" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none font-semibold text-slate-800">
+              <option value="ฮพ 9760">ฮพ 9760 — Toyota Commuter ตู้ 1 / Food Bank (พี่เก่ง)</option>
+              <option value="ฮพ 9630">ฮพ 9630 — Toyota Commuter ตู้ 2 (พี่ดิ่ง)</option>
+              <option value="ฮร 3389">ฮร 3389 — Isuzu Spark สองแถว (พี่โย)</option>
+              <option value="ฏห 4265">ฏห 4265 — Chevrolet Colorado กระบะ 4 ประตู (พี่มาด)</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ชิ้นส่วนหรือระบบที่ชำรุด <span class="text-rose-500">*</span></label>
+              <input type="text" id="repair-parts" required placeholder="เช่น แอร์ไม่เย็น, เบรกมีเสียง, ยางรั่ว" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ระดับความเร่งด่วน <span class="text-rose-500">*</span></label>
+              <select id="repair-urgency" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none font-medium">
+                <option value="ปกติ">ปกติ (ใช้งานได้ แต่ควรซ่อม)</option>
+                <option value="ด่วน">ด่วน (กระทบการใช้งาน)</option>
+                <option value="ด่วนที่สุด">ด่วนที่สุด (รถหยุดวิ่งทันที)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">รายละเอียดอาการชำรุด <span class="text-rose-500">*</span></label>
+            <textarea id="repair-symptoms" required rows="3" placeholder="อธิบายอาการอย่างละเอียด" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none"></textarea>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ชื่อผู้แจ้ง <span class="text-rose-500">*</span></label>
+            <input type="text" id="repair-reporter" required placeholder="ระบุชื่อผู้แจ้ง" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">รูปถ่ายจุดที่ชำรุด (ถ้ามี)</label>
+            <input type="file" id="repair-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100">
+          </div>
+
+          <button type="submit" id="btn-repair-submit" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl shadow-lg shadow-rose-500/25 transition flex items-center justify-center space-x-2 text-sm">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>ส่งรายงานแจ้งซ่อม</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 10: ROSTER (ทำเนียบ พขร. และยานพาหนะราชการ) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-roster" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold font-heading text-slate-900">👥 ทำเนียบ พขร. และยานพาหนะ</h2>
+          <p class="text-xs text-slate-500">ข้อมูลติดต่อและรถประจำตำแหน่ง</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <!-- Card พี่มาด -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2">
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold font-heading text-lg">มาด</div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">นายสามารถ สร้อยสูงเนิน (พี่มาด)</h3>
+              <p class="text-xs text-brand-600 font-semibold">พนักงานขับรถยนต์</p>
+            </div>
+          </div>
+          <div class="text-xs text-slate-600 space-y-1 pt-1 border-t border-slate-100">
+            <p>🚗 <strong>รถประจำ:</strong> ฏห 4265 (Chevrolet กระบะ 4 ประตู)</p>
+            <p>🛵 <strong>มอเตอร์ไซค์คู่เวร:</strong> 3กฒ 8864 (Wave 110i)</p>
+            <p>📞 <strong>เบอร์โทร:</strong> <a href="tel:0890000000" class="text-blue-600 font-medium">089-000-0000</a></p>
+          </div>
+        </div>
+
+        <!-- Card พี่เก่ง -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2">
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold font-heading text-lg">เก่ง</div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">นายรณกร เจตน์ณิชากร (พี่เก่ง)</h3>
+              <p class="text-xs text-brand-600 font-semibold">พนักงานขับรถยนต์</p>
+            </div>
+          </div>
+          <div class="text-xs text-slate-600 space-y-1 pt-1 border-t border-slate-100">
+            <p>🚗 <strong>รถประจำ:</strong> ฮพ 9760 (Commuter ตู้ 1 / Food Bank)</p>
+            <p>🛵 <strong>มอเตอร์ไซค์คู่เวร:</strong> 6กง 2768 (Wave 110i)</p>
+            <p>📞 <strong>เบอร์โทร:</strong> <a href="tel:0890000000" class="text-blue-600 font-medium">089-000-0000</a></p>
+          </div>
+        </div>
+
+        <!-- Card พี่โย -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2">
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold font-heading text-lg">โย</div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">นายเกรียงไกร บุรมโคตร (พี่โย)</h3>
+              <p class="text-xs text-brand-600 font-semibold">พนักงานขับรถยนต์</p>
+            </div>
+          </div>
+          <div class="text-xs text-slate-600 space-y-1 pt-1 border-t border-slate-100">
+            <p>🚗 <strong>รถประจำ:</strong> ฮร 3389 (Isuzu Spark สองแถว)</p>
+            <p>🛵 <strong>มอเตอร์ไซค์คู่เวร:</strong> 6กง 2765 (Wave 110i)</p>
+            <p>📞 <strong>เบอร์โทร:</strong> <a href="tel:0890000000" class="text-blue-600 font-medium">089-000-0000</a></p>
+          </div>
+        </div>
+
+        <!-- Card พี่ดิ่ง -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2">
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-xl bg-slate-800 text-white flex items-center justify-center font-bold font-heading text-lg">ดิ่ง</div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">นายกิตติ ชมสมุท (พี่ดิ่ง)</h3>
+              <p class="text-xs text-brand-600 font-semibold">พนักงานขับรถยนต์</p>
+            </div>
+          </div>
+          <div class="text-xs text-slate-600 space-y-1 pt-1 border-t border-slate-100">
+            <p>🚗 <strong>รถประจำ:</strong> ฮพ 9630 (Commuter ตู้ 2)</p>
+            <p>🛵 <strong>มอเตอร์ไซค์คู่เวร:</strong> 3กฒ 8863 (Wave 110i)</p>
+            <p>📞 <strong>เบอร์โทร:</strong> <a href="tel:0890000000" class="text-blue-600 font-medium">089-000-0000</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE 11: REGISTER (ลงทะเบียนเข้าใช้งานระบบ) -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="page-register" class="hidden space-y-4 max-w-md mx-auto">
+      <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-4 sm:p-5 text-white shadow-lg">
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-brand-400 text-2xl">
+            <i class="fa-solid fa-user-plus"></i>
+          </div>
+          <div>
+            <h2 class="text-base sm:text-lg font-bold font-heading">ลงทะเบียนเข้าใช้งานระบบ</h2>
+            <p class="text-xs text-slate-400">ระบบตรวจจับ LINE User ID อัตโนมัติ</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <form id="form-register" onsubmit="handleRegisterSubmit(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">LINE User ID (อัตโนมัติ)</label>
+            <input type="text" id="reg-user-id" readonly class="w-full px-3 py-2 bg-slate-100 text-slate-500 border border-slate-200 rounded-xl font-mono text-[11px]">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ชื่อ - นามสกุล <span class="text-rose-500">*</span></label>
+            <input type="text" id="reg-name" required placeholder="เช่น นายสิริพาณิชพงศ์ สุขกระจ่าง" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">ชื่อเล่น</label>
+              <input type="text" id="reg-nickname" placeholder="เช่น เอ็ม, ขวัญ" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">เบอร์โทรศัพท์ <span class="text-rose-500">*</span></label>
+              <input type="tel" id="reg-phone" required placeholder="08x-xxx-xxxx" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ฝ่ายสังกัด <span class="text-rose-500">*</span></label>
+            <select id="reg-dept" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium">
+              <option value="ฝ่ายพัฒนาชุมชนและสวัสดิการสังคม">ฝ่ายพัฒนาชุมชนและสวัสดิการสังคม (ฝ่ายเจ้าของรถ)</option>
+              <option value="ฝ่ายปกครอง">ฝ่ายปกครอง</option>
+              <option value="ฝ่ายทะเบียน">ฝ่ายทะเบียน</option>
+              <option value="ฝ่ายโยธา">ฝ่ายโยธา</option>
+              <option value="ฝ่ายสิ่งแวดล้อมและสุขาภิบาล">ฝ่ายสิ่งแวดล้อมและสุขาภิบาล</option>
+              <option value="ฝ่ายรายได้">ฝ่ายรายได้</option>
+              <option value="ฝ่ายการคลัง">ฝ่ายการคลัง</option>
+              <option value="ฝ่ายการศึกษา">ฝ่ายการศึกษา</option>
+              <option value="ฝ่ายรักษาความสะอาดและสวนสาธารณะ">ฝ่ายรักษาความสะอาดและสวนสาธารณะ</option>
+              <option value="ฝ่ายเทศกิจ">ฝ่ายเทศกิจ</option>
+            </select>
+          </div>
+
+          <button type="submit" id="btn-reg-submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2 text-sm">
+            <i class="fa-solid fa-save"></i>
+            <span>บันทึกข้อมูลลงทะเบียน</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- MODALS (กรณี A, B, C & ยืนยันประกาศ) -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+
+  <!-- MODAL: ยืนยันประกาศคิวรถรอบเดียว (Option A) -->
+  <div id="modal-announce-confirm" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 border border-slate-200">
+      <div class="text-center">
+        <div class="w-14 h-14 mx-auto rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-2xl mb-2">
+          <i class="fa-solid fa-bullhorn"></i>
+        </div>
+        <h3 class="text-base font-bold text-slate-900 font-heading">ยืนยันการประกาศคิวรถประจำวัน?</h3>
+        <p class="text-xs text-slate-500 mt-1">ระบบจะส่งการแจ้งเตือนทาง LINE ไปยังผู้ขอทุกคน และส่งสรุปงานให้ พขร. แต่ละท่านทันที</p>
+      </div>
+
+      <div id="modal-announce-items" class="max-h-48 overflow-y-auto space-y-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <!-- List of items to announce -->
+      </div>
+
+      <div class="flex items-center space-x-2 pt-2">
+        <button onclick="closeModal('modal-announce-confirm')" class="w-1/2 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs transition">ยกเลิก</button>
+        <button onclick="confirmAnnounceAll()" id="btn-confirm-announce" class="w-1/2 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-xs shadow-md transition flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-check"></i>
+          <span>ยืนยันประกาศ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: กรณี A — เพิ่มรายการด่วนหลังประกาศ -->
+  <div id="modal-urgent-add" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center space-x-2">
+          <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold">กรณี A</span>
+          <span>เพิ่มรายการด่วน (หลังประกาศคิว)</span>
+        </h3>
+        <button onclick="closeModal('modal-urgent-add')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="form-urgent-add" onsubmit="handleUrgentSubmit(event)" class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">ชื่อผู้ขอ</label>
+            <input type="text" id="urg-name" required placeholder="ชื่อผู้ขอ" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">วันที่ใช้รถ</label>
+            <input type="date" id="urg-date" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-medium">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">เวลาไป</label>
+            <input type="time" id="urg-time-start" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">เวลากลับ</label>
+            <input type="time" id="urg-time-end" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">สถานที่ปลายทาง</label>
+          <input type="text" id="urg-destination" required placeholder="สถานที่ปลายทาง" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">วัตถุประสงค์</label>
+          <input type="text" id="urg-purpose" required placeholder="วัตถุประสงค์" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
+
+        <!-- Assign vehicle & driver immediately -->
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-amber-900 mb-1">จัดรถให้ทันที</label>
+            <select id="urg-car" required class="w-full px-2.5 py-2 bg-white border border-amber-300 rounded-xl font-semibold text-slate-800">
+              <option value="ฮพ 9760">ฮพ 9760 (ตู้ 1)</option>
+              <option value="ฮพ 9630">ฮพ 9630 (ตู้ 2)</option>
+              <option value="ฮร 3389">ฮร 3389 (สองแถว)</option>
+              <option value="ฏห 4265">ฏห 4265 (กระบะ 4 ประตู)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-amber-900 mb-1">จัด พขร. ให้ทันที</label>
+            <select id="urg-driver" required class="w-full px-2.5 py-2 bg-white border border-amber-300 rounded-xl font-semibold text-slate-800">
+              <option value="นายรณกร เจตน์ณิชากร (พี่เก่ง)">พี่เก่ง (รณกร)</option>
+              <option value="นายกิตติ ชมสมุท (พี่ดิ่ง)">พี่ดิ่ง (กิตติ)</option>
+              <option value="นายเกรียงไกร บุรมโคตร (พี่โย)">พี่โย (เกรียงไกร)</option>
+              <option value="นายสามารถ สร้อยสูงเนิน (พี่มาด)">พี่มาด (สามารถ)</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-500">* รายการนี้จะแจ้งเตือนเฉพาะผู้ขอและ พขร. ที่ได้รับมอบหมายเท่านั้น ไม่กระทบคิวงานเดิม</p>
+
+        <div class="flex items-center space-x-2 pt-2">
+          <button type="button" onclick="closeModal('modal-urgent-add')" class="w-1/2 py-2.5 border border-slate-200 text-slate-700 rounded-xl font-semibold">ยกเลิก</button>
+          <button type="submit" id="btn-urgent-submit" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold shadow-md flex items-center justify-center space-x-1">
+            <i class="fa-solid fa-plus"></i>
+            <span>เพิ่มและแจ้งผลทันที</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: กรณี B — แก้ไขตารางที่ประกาศแล้ว (Warning Modal) -->
+  <div id="modal-revise-queue" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 border border-slate-200">
+      <div class="flex items-center space-x-3 text-amber-600">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-xl">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 font-heading">แก้ไขคิวรถที่ประกาศแล้ว (กรณี B)</h3>
+          <p class="text-[11px] text-amber-700 font-semibold">ระบบจะส่งการแจ้งเตือนใหม่ไปยังทุกคนที่ได้รับผลกระทบ</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5 text-xs">
+        <p>🔖 <strong>รหัส:</strong> <span id="rev-req-id" class="font-mono text-slate-800">-</span></p>
+        <p>👤 <strong>ผู้ขอ:</strong> <span id="rev-requester">-</span></p>
+        <p>📍 <strong>ปลายทาง:</strong> <span id="rev-dest">-</span></p>
+        <p>⏰ <strong>เวลา:</strong> <span id="rev-time">-</span></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">เปลี่ยนเป็นรถ</label>
+          <select id="rev-new-car" class="w-full px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800">
+            <option value="ฮพ 9760">ฮพ 9760 (ตู้ 1)</option>
+            <option value="ฮพ 9630">ฮพ 9630 (ตู้ 2)</option>
+            <option value="ฮร 3389">ฮร 3389 (สองแถว)</option>
+            <option value="ฏห 4265">ฏห 4265 (กระบะ 4 ประตู)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">เปลี่ยนเป็น พขร.</label>
+          <select id="rev-new-driver" class="w-full px-2.5 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-800">
+            <option value="นายรณกร เจตน์ณิชากร (พี่เก่ง)">พี่เก่ง (รณกร)</option>
+            <option value="นายกิตติ ชมสมุท (พี่ดิ่ง)">พี่ดิ่ง (กิตติ)</option>
+            <option value="นายเกรียงไกร บุรมโคตร (พี่โย)">พี่โย (เกรียงไกร)</option>
+            <option value="นายสามารถ สร้อยสูงเนิน (พี่มาด)">พี่มาด (สามารถ)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="text-xs">
+        <label class="block font-semibold text-slate-700 mb-1">เหตุผลในการแก้ไข</label>
+        <input type="text" id="rev-reason" placeholder="เช่น ภารกิจเร่งด่วน หรือ สลับคันตามสภาพงาน" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+      </div>
+
+      <div class="flex items-center space-x-2 pt-2 text-xs font-semibold">
+        <button onclick="closeModal('modal-revise-queue')" class="w-1/2 py-2.5 border border-slate-200 text-slate-700 rounded-xl">ยกเลิก</button>
+        <button onclick="confirmReviseQueue()" id="btn-confirm-revise" class="w-1/2 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-md">ยืนยันแก้ไขและแจ้งซ้ำ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: กรณี C — ยกเลิกรายการหลังประกาศ -->
+  <div id="modal-cancel-request" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 border border-slate-200 text-xs">
+      <div class="text-center">
+        <div class="w-12 h-12 mx-auto rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-2">
+          <i class="fa-solid fa-ban"></i>
+        </div>
+        <h3 class="text-sm font-bold text-slate-900 font-heading">ยกเลิกรายการคิวรถ (กรณี C)</h3>
+        <p class="text-slate-500 mt-1">ระบบจะส่งการแจ้งเตือนยกเลิกไปยังผู้ขอและ พขร. ทันที</p>
+      </div>
+
+      <input type="hidden" id="cancel-req-id">
+      <div>
+        <label class="block font-semibold text-slate-700 mb-1">เหตุผลในการยกเลิก</label>
+        <input type="text" id="cancel-reason" placeholder="ระบุเหตุผลในการยกเลิก" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl">
+      </div>
+
+      <div class="flex items-center space-x-2 pt-2 font-semibold">
+        <button onclick="closeModal('modal-cancel-request')" class="w-1/2 py-2.5 border border-slate-200 text-slate-700 rounded-xl">ปิด</button>
+        <button onclick="confirmCancelRequest()" id="btn-confirm-cancel" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-md">ยืนยันยกเลิก</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold text-white transition-all duration-300 opacity-0 pointer-events-none flex items-center space-x-2">
+    <i id="toast-icon" class="fa-solid fa-circle-check"></i>
+    <span id="toast-msg">ข้อความ</span>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // State Variables
+    let currentUser = null;
+    let adminToken = sessionStorage.getItem('admin_token') || '';
+    let currentTab = 'request';
+    let dashboardData = null;
+    let pendingAssignments = {}; // reqId -> { carPlate, driverName, type }
+
+    // Init Page on Load
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. ตรวจจับ URL Parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialPage = urlParams.get('page') || 'request';
+      const uid = urlParams.get('uid') || '';
+      const token = urlParams.get('token') || '';
+
+      if (token) {
+        adminToken = token;
+        sessionStorage.setItem('admin_token', token);
+      }
+
+      if (uid) {
+        localStorage.setItem('user_line_id', uid);
+        setUserIdToInputs(uid);
+      } else {
+        const storedUid = localStorage.getItem('user_line_id');
+        if (storedUid) setUserIdToInputs(storedUid);
+      }
+
+      // 2. Set Default Dates (Tomorrow for Request & Dashboard, Today for Queue)
+      const tomorrow = getTomorrowDateStr();
+      const today = getTodayDateStr();
+
+      const reqDateInput = document.getElementById('req-date');
+      if (reqDateInput) reqDateInput.value = tomorrow;
+
+      const borrowDateInput = document.getElementById('borrow-date');
+      if (borrowDateInput) borrowDateInput.value = tomorrow;
+
+      const dashDateInput = document.getElementById('dash-date-input');
+      if (dashDateInput) dashDateInput.value = tomorrow;
+
+      const queueDateInput = document.getElementById('queue-date-input');
+      if (queueDateInput) queueDateInput.value = today;
+
+      // 3. Switch to Initial Page
+      switchTab(initialPage);
+    });
+
+    function setUserIdToInputs(uid) {
+      ['req-user-id', 'borrow-user-id', 'reg-user-id', 'login-uid'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.value) el.value = uid;
+      });
+    }
+
+    function switchTab(pageId) {
+      currentTab = pageId;
+
+      // Hide all pages
+      document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+
+      // Deactivate all tab buttons
+      document.querySelectorAll('header div button[id^="tab-"]').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+
+      // Show requested page
+      const targetSec = document.getElementById('page-' + pageId);
+      if (targetSec) {
+        targetSec.classList.remove('hidden');
+      }
+
+      // Activate tab button
+      const targetTab = document.getElementById('tab-' + pageId);
+      if (targetTab) {
+        targetTab.classList.remove('bg-slate-800', 'text-slate-300');
+        targetTab.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+      }
+
+      // Specific Page Hooks
+      if (pageId === 'admin_dashboard') {
+        if (!adminToken) {
+          switchTab('admin_login');
+          return;
+        }
+        loadAdminDashboard();
+      } else if (pageId === 'my_requests') {
+        loadMyRequests();
+      } else if (pageId === 'queue') {
+        loadQueueData();
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // ADMIN LOGIN & LOGOUT
+    // ══════════════════════════════════════════════════════════════
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const userId = document.getElementById('login-uid').value.trim();
+      const pin = document.getElementById('login-pin').value.trim();
+      const btn = document.getElementById('btn-login-submit');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
+
+      callBackend('apiAdminLogin', { userId, pin }, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> <span>เข้าสู่ระบบหลังบ้าน</span>';
+
+        if (res.success) {
+          adminToken = res.token;
+          sessionStorage.setItem('admin_token', res.token);
+          currentUser = res.user;
+          showUserDisplay(res.user);
+          showToast('เข้าสู่ระบบผู้จัดคิวรถเรียบร้อยแล้ว', 'success');
+          switchTab('admin_dashboard');
+        } else {
+          showToast(res.message || 'รหัสผ่านหรือสิทธิ์ไม่ถูกต้อง', 'error');
+        }
+      });
+    }
+
+    function logoutAdmin() {
+      adminToken = '';
+      sessionStorage.removeItem('admin_token');
+      document.getElementById('btn-admin-logout').classList.add('hidden');
+      document.getElementById('user-display').classList.add('hidden');
+      showToast('ออกจากระบบเรียบร้อยแล้ว', 'info');
+      switchTab('request');
+    }
+
+    function showUserDisplay(user) {
+      if (!user) return;
+      document.getElementById('display-user-name').innerText = user.name || user.nickname || 'ผู้จัดคิวรถ';
+      document.getElementById('display-user-role').innerText = user.role.toUpperCase();
+      document.getElementById('user-display').classList.remove('hidden');
+      document.getElementById('btn-admin-logout').classList.remove('hidden');
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // ADMIN DASHBOARD & BATCH ANNOUNCEMENT (Option A)
+    // ══════════════════════════════════════════════════════════════
+    function loadAdminDashboard() {
+      const dateVal = document.getElementById('dash-date-input').value;
+      const listContainer = document.getElementById('admin-pending-list');
+      const announcedContainer = document.getElementById('admin-announced-list');
+
+      listContainer.innerHTML = '<div class="text-center py-8 text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin text-xl mb-1"></i><p>กำลังโหลดข้อมูลคำขอ...</p></div>';
+
+      callBackend('apiAdminGetDashboard', { token: adminToken, date: dateVal }, res => {
+        if (!res.success) {
+          if (res.unauthorized) {
+            showToast('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่', 'error');
+            switchTab('admin_login');
+          } else {
+            showToast(res.message, 'error');
+          }
+          return;
+        }
+
+        dashboardData = res;
+        document.getElementById('dash-date-thai').innerText = res.targetDateThai;
+        document.getElementById('stat-total').innerText = res.stats.total;
+        document.getElementById('stat-pending').innerText = res.stats.pending;
+        document.getElementById('stat-announced').innerText = res.stats.announced;
+        document.getElementById('stat-pending-doc').innerText = res.stats.pendingDoc;
+
+        renderAdminDashboardLists(res);
+      });
+    }
+
+    function renderAdminDashboardLists(data) {
+      const pendingContainer = document.getElementById('admin-pending-list');
+      const announcedContainer = document.getElementById('admin-announced-list');
+      pendingContainer.innerHTML = '';
+      announcedContainer.innerHTML = '';
+      pendingAssignments = {};
+
+      const allItems = [...data.requests, ...data.borrowRequests];
+      const targetDate = data.targetDate;
+
+      // กรองรายการรอจัดคิว (Pending)
+      const pendingItems = allItems.filter(item => item.date === targetDate && item.status === 'pending');
+      const announcedItems = allItems.filter(item => item.date === targetDate && (item.status === 'announced' || item.status === 'amended' || item.status === 'revised'));
+
+      if (pendingItems.length === 0) {
+        pendingContainer.innerHTML = '<div class="text-center py-6 bg-white rounded-xl border border-dashed border-slate-200 text-slate-400 text-xs"><i class="fa-solid fa-check-circle text-2xl text-emerald-400 mb-1"></i><p>ไม่มีคำขอรอจัดคิวในวันนี้ (จัดคิวครบ 100% แล้ว)</p></div>';
+      } else {
+        pendingItems.forEach((item, idx) => {
+          // Default assignment selection based on rotation or preference
+          const defaultCar = item.specifiedDriver && item.specifiedDriver.includes('พี่เก่ง') ? 'ฮพ 9760' :
+                             item.specifiedDriver && item.specifiedDriver.includes('พี่ดิ่ง') ? 'ฮพ 9630' :
+                             item.specifiedDriver && item.specifiedDriver.includes('พี่โย') ? 'ฮร 3389' : 'ฏห 4265';
+          const defaultDriver = item.specifiedDriver && !item.specifiedDriver.includes('ไม่ระบุ') ? item.specifiedDriver : 'นายสามารถ สร้อยสูงเนิน (พี่มาด)';
+
+          pendingAssignments[item.reqId] = {
+            reqId: item.reqId,
+            type: item.type,
+            carPlate: defaultCar,
+            driverName: defaultDriver,
+            date: item.date
+          };
+
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3 transition hover:shadow-md';
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center space-x-2">
+                <input type="checkbox" id="check-${item.reqId}" checked onchange="toggleSelectRequest('${item.reqId}', this.checked)" class="req-checkbox w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500">
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md ${item.type === 'borrow' ? 'bg-sky-100 text-sky-700' : 'bg-brand-100 text-brand-700'}">${item.typeName}</span>
+                <span class="text-xs font-mono font-bold text-slate-800">#${item.reqId}</span>
+              </div>
+              <div>
+                ${item.docStatus === 'pending_doc' ? '<span class="px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-700 rounded-full badge-pulse"><i class="fa-solid fa-clock"></i> ค้างใบใช้รถ</span>' : '<span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-emerald-600 rounded-full"><i class="fa-solid fa-file-check"></i> มีใบใช้รถ</span>'}
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-700 space-y-1">
+              <p>👤 <strong>ผู้ขอ:</strong> ${item.requesterName} | 👥 <strong>${item.passengersCount} คน</strong></p>
+              <p>⏰ <strong>เวลา:</strong> ${item.timeStart} - ${item.timeEnd} น. | 📍 <strong>ปลายทาง:</strong> <span class="font-semibold text-slate-900">${item.destination}</span></p>
+              <p class="text-slate-500">🎯 ${item.purpose}</p>
+            </div>
+
+            <!-- Assignment Row (Option A: Assign Car + Driver right inside card) -->
+            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">จัดรถราชการ:</label>
+                <select onchange="updateAssignment('${item.reqId}', 'carPlate', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800">
+                  <option value="ฮพ 9760" ${defaultCar === 'ฮพ 9760' ? 'selected' : ''}>ฮพ 9760 (ตู้ 1 / Food Bank)</option>
+                  <option value="ฮพ 9630" ${defaultCar === 'ฮพ 9630' ? 'selected' : ''}>ฮพ 9630 (ตู้ 2)</option>
+                  <option value="ฮร 3389" ${defaultCar === 'ฮร 3389' ? 'selected' : ''}>ฮร 3389 (สองแถว)</option>
+                  <option value="ฏห 4265" ${defaultCar === 'ฏห 4265' ? 'selected' : ''}>ฏห 4265 (กระบะ 4 ประตู)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">มอบหมาย พขร.:</label>
+                <select onchange="updateAssignment('${item.reqId}', 'driverName', this.value)" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800">
+                  <option value="นายสามารถ สร้อยสูงเนิน (พี่มาด)" ${defaultDriver.includes('พี่มาด') ? 'selected' : ''}>พี่มาด (นายสามารถ)</option>
+                  <option value="นายรณกร เจตน์ณิชากร (พี่เก่ง)" ${defaultDriver.includes('พี่เก่ง') ? 'selected' : ''}>พี่เก่ง (นายรณกร)</option>
+                  <option value="นายเกรียงไกร บุรมโคตร (พี่โย)" ${defaultDriver.includes('พี่โย') ? 'selected' : ''}>พี่โย (นายเกรียงไกร)</option>
+                  <option value="นายกิตติ ชมสมุท (พี่ดิ่ง)" ${defaultDriver.includes('พี่ดิ่ง') ? 'selected' : ''}>พี่ดิ่ง (นายกิตติ)</option>
+                </select>
+              </div>
+            </div>
+          `;
+          pendingContainer.appendChild(card);
+        });
+      }
+
+      // Render Announced Items
+      if (announcedItems.length === 0) {
+        announcedContainer.innerHTML = '<div class="text-center py-6 bg-white rounded-xl border border-slate-200 text-slate-400 text-xs">ยังไม่มีรายการที่ประกาศผลในวันนี้</div>';
+      } else {
+        announcedItems.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2.5';
+          card.innerHTML = `
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800">
+                  ${item.status === 'amended' ? '🆕 เพิ่มด่วน' : item.status === 'revised' ? '🔄 แก้ไขแล้ว' : '✅ ประกาศแล้ว'}
+                </span>
+                <span class="text-xs font-mono font-bold text-slate-700 ml-1">#${item.reqId}</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <button onclick="openReviseModal('${item.reqId}', '${item.requesterName}', '${item.destination}', '${item.timeStart}-${item.timeEnd}', '${item.carPlate}', '${item.driverName}')" class="px-2.5 py-1 text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-lg border border-amber-200 transition">
+                  <i class="fa-solid fa-pen-to-square"></i> แก้ไขตาราง
+                </button>
+                <button onclick="openCancelModal('${item.reqId}')" class="px-2.5 py-1 text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-lg border border-rose-200 transition">
+                  <i class="fa-solid fa-xmark"></i> ยกเลิก
+                </button>
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-700">
+              <p>👤 <strong>ผู้ขอ:</strong> ${item.requesterName} | ⏰ <strong>${item.timeStart} - ${item.timeEnd} น.</strong></p>
+              <p>📍 <strong>ปลายทาง:</strong> ${item.destination} | 🎯 ${item.purpose}</p>
+              <div class="mt-2 p-2 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-slate-900 font-semibold">
+                <span>🚗 รถ: ${item.carPlate}</span>
+                <span>👤 พขร.: ${item.driverName}</span>
+              </div>
+            </div>
+          `;
+          announcedContainer.appendChild(card);
+        });
+      }
+
+      updateSelectedCount();
+    }
+
+    function updateAssignment(reqId, field, val) {
+      if (!pendingAssignments[reqId]) return;
+      pendingAssignments[reqId][field] = val;
+    }
+
+    function toggleSelectRequest(reqId, isChecked) {
+      if (!isChecked) {
+        delete pendingAssignments[reqId];
+      } else {
+        // Restore
+      }
+      updateSelectedCount();
+    }
+
+    function toggleSelectAllRequests(checked) {
+      document.querySelectorAll('.req-checkbox').forEach(cb => {
+        cb.checked = checked;
+      });
+      updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+      const checkedBoxes = document.querySelectorAll('.req-checkbox:checked');
+      document.getElementById('selected-count').innerText = checkedBoxes.length;
+    }
+
+    function handleBatchAnnounce() {
+      const checkedBoxes = document.querySelectorAll('.req-checkbox:checked');
+      if (checkedBoxes.length === 0) {
+        showToast('กรุณาเลือกรายการที่ต้องการประกาศอย่างน้อย 1 รายการ', 'error');
+        return;
+      }
+
+      const modalItems = document.getElementById('modal-announce-items');
+      modalItems.innerHTML = '';
+
+      checkedBoxes.forEach(cb => {
+        const reqId = cb.id.replace('check-', '');
+        const asg = pendingAssignments[reqId];
+        if (asg) {
+          const row = document.createElement('div');
+          row.className = 'flex justify-between items-center py-1 border-b border-slate-200/60';
+          row.innerHTML = `<span>#${reqId}</span><span class="font-semibold text-brand-700">${asg.carPlate} / ${asg.driverName}</span>`;
+          modalItems.appendChild(row);
+        }
+      });
+
+      openModal('modal-announce-confirm');
+    }
+
+    function confirmAnnounceAll() {
+      const btn = document.getElementById('btn-confirm-announce');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังประกาศ...';
+
+      const checkedBoxes = document.querySelectorAll('.req-checkbox:checked');
+      const assignments = [];
+      checkedBoxes.forEach(cb => {
+        const reqId = cb.id.replace('check-', '');
+        if (pendingAssignments[reqId]) {
+          assignments.push(pendingAssignments[reqId]);
+        }
+      });
+
+      callBackend('apiApproveBatch', { token: adminToken, assignments: assignments }, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>ยืนยันประกาศ</span>';
+        closeModal('modal-announce-confirm');
+
+        if (res.success) {
+          showToast(res.message, 'success');
+          loadAdminDashboard();
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // POST-ANNOUNCEMENT SCENARIOS A, B, C
+    // ══════════════════════════════════════════════════════════════
+    function openUrgentModal() {
+      document.getElementById('urg-date').value = document.getElementById('dash-date-input').value;
+      openModal('modal-urgent-add');
+    }
+
+    function handleUrgentSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-urgent-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...';
+
+      const payload = {
+        token: adminToken,
+        carPlate: document.getElementById('urg-car').value,
+        driverName: document.getElementById('urg-driver').value,
+        reqData: {
+          requesterName: document.getElementById('urg-name').value.trim(),
+          date: document.getElementById('urg-date').value,
+          timeStart: document.getElementById('urg-time-start').value,
+          timeEnd: document.getElementById('urg-time-end').value,
+          destination: document.getElementById('urg-destination').value.trim(),
+          purpose: document.getElementById('urg-purpose').value.trim(),
+          passengersCount: 1,
+          userId: localStorage.getItem('user_line_id') || ''
+        }
+      };
+
+      callBackend('apiAddUrgentRequest', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-plus"></i> <span>เพิ่มและแจ้งผลทันที</span>';
+        closeModal('modal-urgent-add');
+
+        if (res.success) {
+          showToast(res.message, 'success');
+          loadAdminDashboard();
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    function openReviseModal(reqId, requester, dest, time, car, driver) {
+      document.getElementById('rev-req-id').innerText = reqId;
+      document.getElementById('rev-requester').innerText = requester;
+      document.getElementById('rev-dest').innerText = dest;
+      document.getElementById('rev-time').innerText = time;
+      document.getElementById('rev-new-car').value = car;
+      document.getElementById('rev-new-driver').value = driver;
+      document.getElementById('rev-reason').value = '';
+      openModal('modal-revise-queue');
+    }
+
+    function confirmReviseQueue() {
+      const btn = document.getElementById('btn-confirm-revise');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังแก้ไข...';
+
+      const payload = {
+        token: adminToken,
+        reqId: document.getElementById('rev-req-id').innerText,
+        newCar: document.getElementById('rev-new-car').value,
+        newDriver: document.getElementById('rev-new-driver').value,
+        reason: document.getElementById('rev-reason').value.trim()
+      };
+
+      callBackend('apiReviseQueue', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = 'ยืนยันแก้ไขและแจ้งซ้ำ';
+        closeModal('modal-revise-queue');
+
+        if (res.success) {
+          showToast(res.message, 'success');
+          loadAdminDashboard();
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    function openCancelModal(reqId) {
+      document.getElementById('cancel-req-id').value = reqId;
+      document.getElementById('cancel-reason').value = '';
+      openModal('modal-cancel-request');
+    }
+
+    function confirmCancelRequest() {
+      const btn = document.getElementById('btn-confirm-cancel');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังยกเลิก...';
+
+      const payload = {
+        token: adminToken,
+        reqId: document.getElementById('cancel-req-id').value,
+        reason: document.getElementById('cancel-reason').value.trim()
+      };
+
+      callBackend('apiCancelRequest', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = 'ยืนยันยกเลิก';
+        closeModal('modal-cancel-request');
+
+        if (res.success) {
+          showToast(res.message, 'success');
+          loadAdminDashboard();
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // REQUEST SUBMIT (ขอใช้รถในฝ่าย)
+    // ══════════════════════════════════════════════════════════════
+    async function handleRequestSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-request-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่งคำขอ...';
+
+      const docFile = document.getElementById('req-doc-file').files[0];
+      let docBase64 = '';
+      if (docFile) {
+        docBase64 = await readFileAsBase64(docFile);
+      }
+
+      const payload = {
+        userId: document.getElementById('req-user-id').value || localStorage.getItem('user_line_id') || '',
+        requesterName: document.getElementById('req-name').value.trim(),
+        passengersCount: document.getElementById('req-passengers').value,
+        date: document.getElementById('req-date').value,
+        timeStart: document.getElementById('req-time-start').value,
+        timeEnd: document.getElementById('req-time-end').value,
+        destination: document.getElementById('req-destination').value.trim(),
+        purpose: document.getElementById('req-purpose').value.trim(),
+        passengerList: document.getElementById('req-passenger-list').value.trim(),
+        pendingDoc: document.getElementById('req-pending-doc').checked,
+        docImageBase64: docBase64
+      };
+
+      callBackend('apiRequestCar', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>ส่งคำขอใช้รถราชการ</span>';
+
+        if (res.success) {
+          showToast('ส่งคำขอเรียบร้อยแล้ว! รหัส ' + res.reqId, 'success');
+          document.getElementById('form-request').reset();
+          switchTab('my_requests');
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    function togglePendingDoc(checked) {
+      document.getElementById('req-file-box').style.opacity = checked ? '0.5' : '1';
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // BORROW SUBMIT (ขอยืมรถข้ามฝ่าย 9 ฝ่าย)
+    // ══════════════════════════════════════════════════════════════
+    async function handleBorrowSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-borrow-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่งคำขอยืมรถ...';
+
+      const docFile = document.getElementById('borrow-doc-file').files[0];
+      let docBase64 = '';
+      if (docFile) {
+        docBase64 = await readFileAsBase64(docFile);
+      }
+
+      const needDriver = document.querySelector('input[name="borrow-need-driver"]:checked').value;
+
+      const payload = {
+        userId: document.getElementById('borrow-user-id').value || localStorage.getItem('user_line_id') || '',
+        department: document.getElementById('borrow-dept').value,
+        deptHead: document.getElementById('borrow-dept-head').value.trim(),
+        firstName: document.getElementById('borrow-first-name').value.trim(),
+        lastName: document.getElementById('borrow-last-name').value.trim(),
+        position: document.getElementById('borrow-position').value.trim(),
+        phone: document.getElementById('borrow-phone').value.trim(),
+        passengersCount: document.getElementById('borrow-passengers').value,
+        date: document.getElementById('borrow-date').value,
+        timeStart: document.getElementById('borrow-time-start').value,
+        timeEnd: document.getElementById('borrow-time-end').value,
+        destination: document.getElementById('borrow-destination').value.trim(),
+        purpose: document.getElementById('borrow-purpose').value.trim(),
+        needDriver: needDriver,
+        specifiedDriver: needDriver === 'yes' ? document.getElementById('borrow-specified-driver').value : 'ไม่ต้องการ',
+        pendingDoc: document.getElementById('borrow-pending-doc').checked,
+        docImageBase64: docBase64
+      };
+
+      callBackend('apiBorrowCar', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>ยื่นคำขอยืมรถราชการ</span>';
+
+        if (res.success) {
+          showToast('ยื่นคำขอยืมรถเรียบร้อยแล้ว! รหัส ' + res.reqId, 'success');
+          document.getElementById('form-borrow').reset();
+          switchTab('my_requests');
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    function toggleDriverSelect(needed) {
+      document.getElementById('box-specified-driver').style.display = needed ? 'block' : 'none';
+    }
+
+    function toggleBorrowPendingDoc(checked) {
+      document.getElementById('borrow-file-box').style.opacity = checked ? '0.5' : '1';
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // MY REQUESTS LIST & CANCEL
+    // ══════════════════════════════════════════════════════════════
+    function loadMyRequests() {
+      const uid = localStorage.getItem('user_line_id') || '';
+      const container = document.getElementById('my-requests-list');
+
+      if (!uid) {
+        container.innerHTML = '<div class="text-center py-8 bg-white rounded-2xl border border-slate-200 text-xs text-slate-500"><i class="fa-solid fa-id-badge text-2xl text-slate-300 mb-2"></i><p>ไม่พบ LINE User ID กรุณาลงทะเบียนหรือเข้าสู่ระบบผ่าน LINE OA</p><button onclick="switchTab(\'register\')" class="mt-3 px-4 py-2 bg-brand-600 text-white rounded-xl font-semibold">ไปหน้าลงทะเบียน</button></div>';
+        return;
+      }
+
+      container.innerHTML = '<div class="text-center py-12 text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin text-xl mb-1"></i><p>กำลังโหลดคำขอของคุณ...</p></div>';
+
+      callBackend('apiGetMyRequests', uid, items => {
+        if (!items || items.length === 0) {
+          container.innerHTML = '<div class="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200 text-xs text-slate-400"><i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300"></i><p>ท่านยังไม่มีประวัติการยื่นคำขอใช้รถ</p><button onclick="switchTab(\'request\')" class="mt-3 px-4 py-2 bg-brand-600 text-white rounded-xl font-semibold">ยื่นคำขอใหม่</button></div>';
+          return;
+        }
+
+        container.innerHTML = '';
+        items.forEach(req => {
+          const isPending = req.status === 'pending';
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2.5';
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold text-slate-800">#${req.reqId}</span>
+              <div>
+                ${req.status === 'announced' || req.status === 'approved' ? '<span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-800 rounded-full">✅ ได้รับคิวแล้ว</span>' :
+                  req.status === 'amended' ? '<span class="px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-800 rounded-full">🆕 อนุมัติด่วน</span>' :
+                  req.status === 'revised' ? '<span class="px-2 py-0.5 text-[10px] font-bold bg-sky-100 text-sky-800 rounded-full">🔄 มีการปรับปรุงคิว</span>' :
+                  req.status === 'cancelled' ? '<span class="px-2 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 rounded-full">❌ ยกเลิกแล้ว</span>' :
+                  '<span class="px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-full">⏳ รอจัดสรรคิว</span>'}
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-700 space-y-1">
+              <p>📅 <strong>วันที่:</strong> ${req.dateThai} (เวลา ${req.timeStart} - ${req.timeEnd} น.)</p>
+              <p>📍 <strong>ปลายทาง:</strong> <span class="font-semibold text-slate-900">${req.destination}</span></p>
+              <p class="text-slate-500">🎯 ${req.purpose}</p>
+            </div>
+
+            ${req.carPlate && req.carPlate !== '-' ? `
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-900">
+                <span>🚗 รถ: ${req.carPlate}</span>
+                <span>👤 พขร.: ${req.driverName}</span>
+              </div>
+            ` : ''}
+
+            ${isPending ? `
+              <div class="pt-1 text-right">
+                <button onclick="cancelMyReq('${req.reqId}')" class="px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 font-semibold transition">
+                  <i class="fa-solid fa-xmark mr-1"></i> ขอยกเลิกคำขอนี้
+                </button>
+              </div>
+            ` : ''}
+          `;
+          container.appendChild(card);
+        });
+      });
+    }
+
+    function cancelMyReq(reqId) {
+      if (!confirm('ยืนยันขอยกเลิกคำขอ #' + reqId + ' หรือไม่?')) return;
+      const uid = localStorage.getItem('user_line_id') || '';
+
+      callBackend('apiCancelMyRequest', { reqId: reqId, userId: uid }, res => {
+        if (res.success) {
+          showToast(res.message, 'success');
+          loadMyRequests();
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // QUEUE DISPLAY (ตารางคิวรถสาธารณะ)
+    // ══════════════════════════════════════════════════════════════
+    function loadQueueData() {
+      const dateVal = document.getElementById('queue-date-input').value;
+      const container = document.getElementById('queue-items-container');
+      container.innerHTML = '<div class="text-center py-8 text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin text-xl mb-1"></i><p>กำลังโหลดตารางคิวรถ...</p></div>';
+
+      callBackend('apiGetQueueData', dateVal, res => {
+        document.getElementById('queue-date-label').innerText = res.dateThai + ' (วัน' + res.dayOfWeek + ')';
+
+        if (!res.items || res.items.length === 0) {
+          container.innerHTML = '<div class="text-center py-8 bg-white rounded-2xl border border-slate-200 text-xs text-slate-400"><i class="fa-solid fa-calendar-xmark text-3xl mb-2 text-slate-300"></i><p>ไม่มีภารกิจการใช้รถในวันนี้</p></div>';
+          return;
+        }
+
+        container.innerHTML = '';
+        res.items.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2';
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 text-[10px] font-bold bg-slate-800 text-white rounded-md">ลำดับที่ ${idx + 1}</span>
+              <span class="text-xs font-bold text-brand-600 font-mono">${item.timeStart} - ${item.timeEnd} น.</span>
+            </div>
+            <div class="text-xs text-slate-800 space-y-1">
+              <p>📍 <strong>ปลายทาง:</strong> <span class="font-bold text-slate-900">${item.destination}</span></p>
+              <p class="text-slate-500">🎯 ${item.purpose}</p>
+              <p>👤 <strong>ผู้ขอใช้รถ:</strong> ${item.requester} (${item.passengers} คน)</p>
+            </div>
+            <div class="p-2 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
+              <span>🚗 ทะเบียน: ${item.plate}</span>
+              <span>👤 พขร.: ${item.driver}</span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // DRIVER OPERATIONS: MILEAGE, FUEL, REPAIR
+    // ══════════════════════════════════════════════════════════════
+    async function handleMileageSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-mileage-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึกไมล์...';
+
+      const file = document.getElementById('mileage-file').files[0];
+      let imgBase64 = '';
+      if (file) imgBase64 = await readFileAsBase64(file);
+
+      const payload = {
+        plate: document.getElementById('mileage-plate').value,
+        period: document.getElementById('mileage-period').value,
+        mileage: document.getElementById('mileage-val').value,
+        driverName: document.getElementById('mileage-driver').value.trim(),
+        userId: localStorage.getItem('user_line_id') || '',
+        imageBase64: imgBase64
+      };
+
+      callBackend('apiSaveMileage', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> <span>บันทึกเลขไมล์ (แบบ 4)</span>';
+        if (res.success) {
+          showToast(res.message, 'success');
+          document.getElementById('mileage-val').value = '';
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    async function handleFuelSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-fuel-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึกเติมน้ำมัน...';
+
+      const file = document.getElementById('fuel-file').files[0];
+      let imgBase64 = '';
+      if (file) imgBase64 = await readFileAsBase64(file);
+
+      const payload = {
+        plate: document.getElementById('fuel-plate').value,
+        station: document.getElementById('fuel-station').value.trim(),
+        liters: document.getElementById('fuel-liters').value,
+        mileage: document.getElementById('fuel-mileage').value,
+        driverName: document.getElementById('fuel-driver').value.trim(),
+        userId: localStorage.getItem('user_line_id') || '',
+        imageBase64: imgBase64
+      };
+
+      callBackend('apiSaveFuel', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> <span>บันทึกการเติมน้ำมัน</span>';
+        if (res.success) {
+          showToast(res.message, 'success');
+          document.getElementById('form-fuel').reset();
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    async function handleRepairSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-repair-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่งแจ้งซ่อม...';
+
+      const file = document.getElementById('repair-file').files[0];
+      let imgBase64 = '';
+      if (file) imgBase64 = await readFileAsBase64(file);
+
+      const payload = {
+        plate: document.getElementById('repair-plate').value,
+        parts: document.getElementById('repair-parts').value.trim(),
+        urgency: document.getElementById('repair-urgency').value,
+        symptoms: document.getElementById('repair-symptoms').value.trim(),
+        reporter: document.getElementById('repair-reporter').value.trim(),
+        userId: localStorage.getItem('user_line_id') || '',
+        imageBase64: imgBase64
+      };
+
+      callBackend('apiReportRepair', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>ส่งรายงานแจ้งซ่อม</span>';
+        if (res.success) {
+          showToast(res.message, 'success');
+          document.getElementById('form-repair').reset();
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // REGISTER SUBMIT
+    // ══════════════════════════════════════════════════════════════
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-reg-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึกข้อมูล...';
+
+      const uid = document.getElementById('reg-user-id').value.trim();
+      const payload = {
+        userId: uid,
+        name: document.getElementById('reg-name').value.trim(),
+        nickname: document.getElementById('reg-nickname').value.trim(),
+        phone: document.getElementById('reg-phone').value.trim(),
+        department: document.getElementById('reg-dept').value
+      };
+
+      callBackend('apiRegister', payload, res => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-save"></i> <span>บันทึกข้อมูลลงทะเบียน</span>';
+
+        if (res.success) {
+          showToast('ลงทะเบียนสำเร็จแล้วครับ (' + (res.role || 'requester') + ')', 'success');
+          if (uid) localStorage.setItem('user_line_id', uid);
+          switchTab('request');
+        } else {
+          showToast(res.message, 'error');
+        }
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // HELPERS & BRIDGE
+    // ══════════════════════════════════════════════════════════════
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxwgY9iTsPpPz2OtW_0klIPyDq2ccYX__sjrM6gfoDOrHC3dgSjRXuCm8OBw9oz9_NVvw/exec';
+
+    function callBackend(fnName, param, callback) {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(callback)
+          .withFailureHandler(err => {
+            showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+            if (callback) callback({ success: false, message: err.message });
+          })[fnName](param);
+      } else {
+        // สำหรับรันบน GitHub Pages / เว็บบราวเซอร์ภายนอก ผ่าน Fetch API
+        fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({
+            action: fnName,
+            payload: param
+          })
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          return response.json();
+        })
+        .then(data => {
+          if (callback) callback(data);
+        })
+        .catch(err => {
+          console.error('API Error:', err);
+          showToast('การเชื่อมต่อขัดข้อง: ' + err.message, 'error');
+          if (callback) callback({ success: false, message: err.message });
+        });
+      }
+    }
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function getTodayDateStr() {
+      const d = new Date();
+      return formatDate(d);
+    }
+
+    function getTomorrowDateStr() {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      return formatDate(d);
+    }
+
+    function formatDate(d) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    }
+
+    function showToast(msg, type = 'info') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.innerText = msg;
+
+      if (type === 'success') {
+        toast.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold text-white bg-emerald-600 flex items-center space-x-2 transition-all duration-300 opacity-100';
+        toastIcon.className = 'fa-solid fa-circle-check text-white';
+      } else if (type === 'error') {
+        toast.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold text-white bg-rose-600 flex items-center space-x-2 transition-all duration-300 opacity-100';
+        toastIcon.className = 'fa-solid fa-triangle-exclamation text-white';
+      } else {
+        toast.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold text-white bg-slate-900 flex items-center space-x-2 transition-all duration-300 opacity-100';
+        toastIcon.className = 'fa-solid fa-circle-info text-brand-400';
+      }
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 3500);
+    }
+
+    function closeLiffWindow() {
+      if (typeof liff !== 'undefined' && liff.closeWindow) {
+        liff.closeWindow();
+      } else {
+        window.close();
+      }
+    }
+  </script>
+</body>
+</html>
