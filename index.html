@@ -1250,13 +1250,70 @@
     let pendingAssignments = {}; // reqId -> { carPlate, driverName, type }
     const LIFF_ID = '2011779092-i5rhj1mo';
 
+    // 🔍 ถอดรหัสหาหน้าที่ต้องการเปิดอย่างแม่นยำ (รองรับทั้ง direct query, liff.state จาก LINE, และ hash)
+    function getTargetPageFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let page = urlParams.get('page');
+      if (page) return page.trim();
+
+      // ตรวจสอบจาก liff.state ที่ LINE ส่งมา (เช่น ?liff.state=%3Fpage%3Dborrow หรือ %2F%3Fpage%3Dborrow)
+      const liffState = urlParams.get('liff.state');
+      if (liffState) {
+        try {
+          const decoded = decodeURIComponent(liffState);
+          const qIdx = decoded.indexOf('?');
+          const queryPart = qIdx !== -1 ? decoded.substring(qIdx) : (decoded.startsWith('page=') ? ('?' + decoded) : decoded);
+          const subParams = new URLSearchParams(queryPart);
+          if (subParams.get('page')) {
+            return subParams.get('page').trim();
+          }
+          const m = decoded.match(/page[=/]([a-zA-Z0-9_-]+)/);
+          if (m && m[1]) return m[1].trim();
+        } catch (e) {
+          console.warn('Error parsing liff.state:', e);
+        }
+      }
+
+      // ตรวจสอบจาก Hash Fragment (#page=borrow หรือ #borrow)
+      if (window.location.hash) {
+        const hash = window.location.hash.replace(/^#/, '');
+        if (hash.startsWith('page=')) {
+          return hash.split('=')[1].trim();
+        }
+        const cleanHash = hash.replace(/^//, '').split('?')[0];
+        const knownPages = ['request', 'borrow', 'my_requests', 'queue', 'admin_dashboard', 'mileage', 'fuel', 'repair', 'roster', 'register', 'admin_login'];
+        if (knownPages.includes(cleanHash)) {
+          return cleanHash;
+        }
+      }
+
+      return 'request';
+    }
+
+    function getUrlParamSafe(paramName) {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get(paramName)) return urlParams.get(paramName).trim();
+
+      const liffState = urlParams.get('liff.state');
+      if (liffState) {
+        try {
+          const decoded = decodeURIComponent(liffState);
+          const qIdx = decoded.indexOf('?');
+          if (qIdx !== -1) {
+            const subParams = new URLSearchParams(decoded.substring(qIdx));
+            if (subParams.get(paramName)) return subParams.get(paramName).trim();
+          }
+        } catch (e) {}
+      }
+      return '';
+    }
+
     // Init Page on Load
     document.addEventListener('DOMContentLoaded', async () => {
-      // 1. ตรวจจับ URL Parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const initialPage = urlParams.get('page') || 'request';
-      const uid = urlParams.get('uid') || '';
-      const token = urlParams.get('token') || '';
+      // 1. ตรวจจับ URL Parameters อย่างครอบคลุม
+      const initialPage = getTargetPageFromUrl();
+      const uid = getUrlParamSafe('uid');
+      const token = getUrlParamSafe('token');
 
       if (token) {
         adminToken = token;
@@ -1335,6 +1392,19 @@
             document.getElementById('reg-title').innerText = 'แก้ไขข้อมูลโปรไฟล์ผู้ใช้งาน';
             document.getElementById('btn-reg-text').innerText = 'อัปเดตข้อมูลส่วนตัว';
           }
+
+          // กรณีเข้าหน้า Admin Dashboard และเป็น Admin แล้ว แต่ยังไม่มี Token ให้ขอ Token ผ่าน LIFF อัตโนมัติ
+          if (targetPage === 'admin_dashboard' && res.member.roleKey === 'admin' && !adminToken) {
+            callBackend('apiAdminLiffAuth', { userId: userId }, liffAuthRes => {
+              if (liffAuthRes && liffAuthRes.success && liffAuthRes.token) {
+                adminToken = liffAuthRes.token;
+                sessionStorage.setItem('admin_token', adminToken);
+              }
+              switchTab(targetPage);
+            });
+            return;
+          }
+
           switchTab(targetPage || 'request');
         } else {
           // ยังไม่ได้ลงทะเบียน
@@ -1477,6 +1547,18 @@
       // Specific Page Hooks
       if (pageId === 'admin_dashboard') {
         if (!adminToken) {
+          if (currentUser && currentUser.roleKey === 'admin' && currentUser.userId) {
+            callBackend('apiAdminLiffAuth', { userId: currentUser.userId }, liffAuthRes => {
+              if (liffAuthRes && liffAuthRes.success && liffAuthRes.token) {
+                adminToken = liffAuthRes.token;
+                sessionStorage.setItem('admin_token', adminToken);
+                loadAdminDashboard();
+              } else {
+                switchTab('admin_login');
+              }
+            });
+            return;
+          }
           switchTab('admin_login');
           return;
         }
