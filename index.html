@@ -446,7 +446,7 @@
           </div>
 
           <!-- ══════════════════════════════════════════════════════════ -->
-          <!-- 2. เลือกรถและจำนวนผู้โดยสาร -->
+          <!-- 2. ประเภทยานพาหนะและจำนวนผู้โดยสาร -->
           <!-- ══════════════════════════════════════════════════════════ -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -471,7 +471,20 @@
           </div>
 
           <!-- ══════════════════════════════════════════════════════════ -->
-          <!-- 3. วันเวลาเดินทาง (รองรับ Multi-Day) -->
+          <!-- 3. สถานที่ปลายทางและวัตถุประสงค์ -->
+          <!-- ══════════════════════════════════════════════════════════ -->
+          <div>
+            <label class="block font-semibold text-stone-700 mb-1">สถานที่ปลายทาง (ไปที่ไหน) <span class="text-rose-500">*</span></label>
+            <input type="text" id="req-destination" required placeholder="เช่น ศาลาว่าการกรุงเทพมหานคร 2 (ดินแดง)" class="w-full px-3 py-2.5 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-stone-700 mb-1">วัตถุประสงค์ในการขอใช้รถ (เพื่ออะไร) <span class="text-rose-500">*</span></label>
+            <textarea id="req-purpose" rows="2" required placeholder="ระบุภารกิจหรือวัตถุประสงค์ในการเดินทาง" class="w-full px-3 py-2 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500"></textarea>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════════ -->
+          <!-- 4. วันเวลาเดินทาง (รองรับ Multi-Day) -->
           <!-- ══════════════════════════════════════════════════════════ -->
           <div class="p-3.5 bg-[#f5efe4] rounded-xl border border-[#e5dcce] space-y-3">
             <div class="flex items-center justify-between">
@@ -517,9 +530,9 @@
           </div>
 
           <!-- ══════════════════════════════════════════════════════════ -->
-          <!-- 4. สายการเสนอลงนาม (ระบบคำนวณอัตโนมัติ 08:00 - 16:00) -->
+          <!-- 5. การเสนอลงนามและอนุมัติใบขอใช้รถราชการ (รองล่างสุด เหนือส่วนรูปแบบเอกสาร) -->
           <!-- ══════════════════════════════════════════════════════════ -->
-          <div id="signatory-card" class="p-3.5 bg-[#fdfbf7] rounded-xl border border-[#e8dfcf] space-y-2 shadow-sm">
+          <div id="signatory-card" class="p-3.5 bg-[#fdfbf7] rounded-xl border border-[#e8dfcf] space-y-3 shadow-sm">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-stone-800 flex items-center space-x-1.5">
                 <i class="fa-solid fa-file-signature text-amber-600"></i>
@@ -530,19 +543,47 @@
               </span>
             </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-[#eee6da]">
-              <div>
-                <p id="signatory-approver-display" class="font-bold text-stone-900 text-xs">
-                  <span class="text-stone-500 font-normal">ผู้อนุมัติ:</span> นางสาวภริตพร หมื่นสม
+            <!-- กล่องแสดงผล 2 ส่วนชัดเจน: หัวหน้าฝ่ายฯ และ ผู้อนุมัติ -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-[#eee6da]">
+              <!-- ส่วนที่ 1: หัวหน้าฝ่ายพัฒนาชุมชนฯ (ผู้เสนอ / ผู้สั่งใช้รถ) -->
+              <div class="p-2.5 bg-white/90 rounded-xl border border-[#ede5d8] space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-semibold text-stone-500 flex items-center">
+                    <i class="fa-solid fa-user-check text-amber-600 mr-1"></i> 1. หัวหน้าฝ่ายฯ (ผู้เสนอขอ):
+                  </span>
+                  <span id="sig-head-badge" class="px-1.5 py-0.2 text-[9px] bg-emerald-100 text-emerald-800 rounded font-bold">ตัวจริง</span>
+                </div>
+                <p id="sig-head-name" class="font-bold text-stone-900 text-xs font-heading">
+                  นางสาวภริตพร หมื่นสม
                 </p>
-                <p id="signatory-pos-display" class="text-[11px] text-stone-600 font-medium">
+                <p id="sig-head-pos" class="text-[10px] text-stone-600 leading-tight">
                   หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม
                 </p>
-                <p id="signatory-mode-note" class="text-[10px] text-stone-500 mt-0.5">
-                  * เดินทางในวันและเวลาราชการปกติ (08.00 - 16.00 น.) หัวหน้าฝ่ายฯ มีอำนาจอนุมัติจบในฝ่าย
+              </div>
+
+              <!-- ส่วนที่ 2: ผู้มีอำนาจอนุมัติสั่งใช้รถ -->
+              <div class="p-2.5 bg-white/90 rounded-xl border border-[#ede5d8] space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-semibold text-stone-500 flex items-center">
+                    <i class="fa-solid fa-stamp text-amber-600 mr-1"></i> 2. ผู้มีอำนาจอนุมัติสั่งใช้รถ:
+                  </span>
+                  <span id="sig-approver-badge" class="px-1.5 py-0.2 text-[9px] bg-emerald-100 text-emerald-800 rounded font-bold">อนุมัติในฝ่าย</span>
+                </div>
+                <p id="sig-approver-name" class="font-bold text-stone-900 text-xs font-heading">
+                  นางสาวภริตพร หมื่นสม
+                </p>
+                <p id="sig-approver-pos" class="text-[10px] text-stone-600 leading-tight">
+                  หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม
                 </p>
               </div>
-              <div class="flex items-center space-x-1.5 self-start sm:self-center">
+            </div>
+
+            <!-- หมายเหตุและปุ่มปรับเปลี่ยน -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-[#f0e9dd] text-[11px]">
+              <p id="signatory-mode-note" class="text-[10px] text-stone-500">
+                * เดินทางในวันและเวลาราชการปกติ (08.00 - 16.00 น.) หัวหน้าฝ่ายฯ มีอำนาจอนุมัติจบในฝ่าย
+              </p>
+              <div class="flex items-center space-x-1.5 self-start sm:self-center shrink-0">
                 <button type="button" onclick="openSignatoryOverrideModal()" class="px-3 py-1.5 text-xs font-bold bg-[#faf7f2] hover:bg-white text-stone-800 border border-[#d8cfbe] rounded-xl shadow-sm transition flex items-center space-x-1.5">
                   <i class="fa-solid fa-arrows-rotate text-amber-600"></i>
                   <span>เปลี่ยนผู้ลงนาม</span>
@@ -556,47 +597,58 @@
             <!-- Hidden Form Inputs for Signatory -->
             <input type="hidden" id="req-signatory-name" value="นางสาวภริตพร หมื่นสม">
             <input type="hidden" id="req-signatory-pos" value="หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม">
+            <input type="hidden" id="req-head-name" value="นางสาวภริตพร หมื่นสม">
+            <input type="hidden" id="req-head-pos" value="หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม">
+            <input type="hidden" id="req-approver-name" value="นางสาวภริตพร หมื่นสม">
+            <input type="hidden" id="req-approver-pos" value="หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม">
           </div>
 
           <!-- ══════════════════════════════════════════════════════════ -->
-          <!-- 5. สถานที่ปลายทางและวัตถุประสงค์ -->
+          <!-- 6. รูปแบบเอกสาร (ยังไม่ได้เขียน vs เขียนแล้ว — รองรับถ่ายหลายรูป) -->
           <!-- ══════════════════════════════════════════════════════════ -->
-          <div>
-            <label class="block font-semibold text-stone-700 mb-1">สถานที่ปลายทาง (ไปที่ไหน) <span class="text-rose-500">*</span></label>
-            <input type="text" id="req-destination" required placeholder="เช่น ศาลาว่าการกรุงเทพมหานคร 2 (ดินแดง)" class="w-full px-3 py-2.5 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
-          </div>
-
-          <div>
-            <label class="block font-semibold text-stone-700 mb-1">วัตถุประสงค์ในการขอใช้รถ (เพื่ออะไร) <span class="text-rose-500">*</span></label>
-            <textarea id="req-purpose" rows="2" required placeholder="ระบุภารกิจหรือวัตถุประสงค์ในการเดินทาง" class="w-full px-3 py-2 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500"></textarea>
-          </div>
-
-          <!-- ══════════════════════════════════════════════════════════ -->
-          <!-- 6. รูปแบบเอกสาร (ยังไม่ได้เขียน vs เขียนแล้ว) -->
-          <!-- ══════════════════════════════════════════════════════════ -->
-          <div class="p-3.5 bg-[#fcfaf7] rounded-xl border border-[#e6decf] space-y-3">
+          <div id="req-doc-choice-box" class="p-3.5 bg-[#fcfaf7] rounded-xl border border-[#e6decf] space-y-3">
             <label class="block font-semibold text-stone-800 text-xs">รูปแบบเอกสารใบขอใช้รถราชการ (แบบ ๓)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
               <label class="flex items-start space-x-2.5 p-3 rounded-xl border border-amber-300 bg-amber-50/60 cursor-pointer transition hover:bg-amber-50">
                 <input type="radio" name="req-doc-choice" value="not_written" checked onchange="toggleDocChoice(this.value)" class="mt-0.5 text-amber-600 focus:ring-amber-500">
                 <div>
                   <strong class="text-stone-900 block font-heading">1. ยังไม่ได้เขียนใบใช้รถ</strong>
-                  <span class="text-[11px] text-stone-600">ระบบจะสร้างไฟล์ Word (.docx) และ PDF ให้ดาวน์โหลดทันที</span>
+                  <span class="text-[11px] text-stone-600">ระบบจะสร้างไฟล์ Word และ PDF บน Google Drive ให้ดาวน์โหลดทันที</span>
                 </div>
               </label>
               <label class="flex items-start space-x-2.5 p-3 rounded-xl border border-stone-200 bg-white cursor-pointer transition hover:bg-stone-50">
                 <input type="radio" name="req-doc-choice" value="written" onchange="toggleDocChoice(this.value)" class="mt-0.5 text-amber-600 focus:ring-amber-500">
                 <div>
                   <strong class="text-stone-900 block font-heading">2. เขียนใบใช้รถแล้ว</strong>
-                  <span class="text-[11px] text-stone-600">แนบรูปถ่ายใบขอใช้รถจริงที่เขียนหรือลงนามแล้ว</span>
+                  <span class="text-[11px] text-stone-600">แนบรูปถ่ายใบขอใช้รถจริง (ถ่ายหรือเลือกได้หลายรูป)</span>
                 </div>
               </label>
             </div>
 
-            <div id="req-file-box" class="hidden space-y-2 pt-2 border-t border-[#ede5d8]">
-              <label class="block font-semibold text-stone-700 text-xs">แนบรูปถ่ายใบขอใช้รถ</label>
-              <input type="file" id="req-doc-file" accept="image/*" class="w-full text-xs text-stone-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200">
-              <label class="flex items-center space-x-2 text-stone-600 text-xs mt-1">
+            <!-- กล่องแนบรูปถ่ายหลายรูป (Multi-Photo) -->
+            <div id="req-file-box" class="hidden space-y-2.5 pt-2.5 border-t border-[#ede5d8]">
+              <div class="flex items-center justify-between">
+                <label class="block font-semibold text-stone-800 text-xs">
+                  <i class="fa-solid fa-camera text-amber-600 mr-1"></i> แนบรูปถ่ายใบขอใช้รถราชการ (ถ่ายหรือเลือกได้หลายรูป)
+                </label>
+                <span id="req-photo-count-badge" class="hidden text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                  0 รูป
+                </span>
+              </div>
+
+              <!-- ปุ่มเลือกรูป/ถ่ายรูป -->
+              <input type="file" id="req-doc-files" accept="image/*" capture="environment" multiple onchange="handleDocFilesSelected(event)" class="hidden">
+              <button type="button" onclick="document.getElementById('req-doc-files').click()" class="w-full py-2.5 px-3 bg-[#fdfbf7] hover:bg-white text-stone-800 border-2 border-dashed border-[#dcd3c3] hover:border-amber-500 rounded-xl transition flex items-center justify-center space-x-2 text-xs font-semibold shadow-sm">
+                <i class="fa-solid fa-camera text-amber-600 text-sm"></i>
+                <span>กดเพื่อถ่ายรูป หรือ เลือกรูปใบใช้รถ (แนบได้หลายรูป)</span>
+              </button>
+
+              <!-- Gallery แสดงรูปตัวอย่าง -->
+              <div id="req-photo-preview-gallery" class="hidden grid grid-cols-3 sm:grid-cols-4 gap-2 pt-1">
+                <!-- Dynamically populated thumbnails -->
+              </div>
+
+              <label class="flex items-center space-x-2 text-stone-600 text-xs mt-1 cursor-pointer">
                 <input type="checkbox" id="req-pending-doc" onchange="togglePendingDoc(this.checked)" class="rounded text-amber-600 border-stone-300">
                 <span>เอกสารตัวจริงยังอยู่ระหว่างเสนอลงนาม (แนบตามหลังได้)</span>
               </label>
@@ -1363,24 +1415,24 @@
         </button>
       </div>
 
-      <!-- Section 1: ในเวลาราชการ (หัวหน้าฝ่ายฯ & รักษาการ 5 ท่าน) -->
+      <!-- Section 1: หัวหน้าฝ่ายพัฒนาชุมชนฯ (ผู้เสนอขอ / สั่งใช้รถ) -->
       <div class="space-y-2">
         <div class="flex items-center space-x-1.5 text-xs font-bold text-emerald-900">
           <i class="fa-solid fa-building-user text-emerald-600"></i>
-          <span>1. ในเวลาราชการ (08.00 - 16.00 น.) — หัวหน้าฝ่ายฯ และลำดับรักษาการแทน</span>
+          <span>1. หัวหน้าฝ่ายพัฒนาชุมชนฯ (ผู้เสนอขอ / สั่งใช้รถ) — ตัวจริง และ 5 ลำดับรักษาการ</span>
         </div>
         <div class="space-y-1.5 text-xs">
           <!-- 0: หัวหน้าฝ่ายพัฒนาชุมชนฯ ตัวจริง -->
-          <div onclick="selectSignatoryOption('นางสาวภริตพร หมื่นสม', 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'หัวหน้าฝ่ายพัฒนาชุมชนฯ (ค่าเริ่มต้น)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('head', 'นางสาวภริตพร หมื่นสม', 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'หัวหน้าฝ่ายพัฒนาชุมชนฯ (ตัวจริง)', 'ตัวจริง')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">นางสาวภริตพร หมื่นสม (พี่ฝน)</p>
               <p class="text-[10px] text-stone-500">นักพัฒนาสังคมชำนาญการพิเศษ หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม</p>
             </div>
-            <span class="px-2 py-0.5 text-[9px] bg-emerald-100 text-emerald-800 rounded font-bold">ค่าเริ่มต้น</span>
+            <span class="px-2 py-0.5 text-[9px] bg-emerald-100 text-emerald-800 rounded font-bold">ตัวจริง</span>
           </div>
 
           <!-- 1: รักษาการ ลำดับ 1 (พี่มิ้น) -->
-          <div onclick="selectSignatoryOption('นางสาววิภารัตน์ เหล็งสา', 'นักจัดการงานทั่วไปปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รักษาการในตำแหน่ง หน.ฝ่ายฯ ลำดับที่ 1 (พี่มิ้น)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('head', 'นางสาววิภารัตน์ เหล็งสา', 'นักจัดการงานทั่วไปปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รรท. หน.ฝ่ายฯ (พี่มิ้น)', 'รักษาการ ลำดับ 1')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">1. นางสาววิภารัตน์ เหล็งสา (พี่มิ้น)</p>
               <p class="text-[10px] text-stone-500">นักจัดการงานทั่วไปปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนฯ</p>
@@ -1389,7 +1441,7 @@
           </div>
 
           <!-- 2: รักษาการ ลำดับ 2 (พี่แมว) -->
-          <div onclick="selectSignatoryOption('นายสิทธิชัย รอดคุ้ม', 'นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รักษาการในตำแหน่ง หน.ฝ่ายฯ ลำดับที่ 2 (พี่แมว)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('head', 'นายสิทธิชัย รอดคุ้ม', 'นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รรท. หน.ฝ่ายฯ (พี่แมว)', 'รักษาการ ลำดับ 2')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">2. นายสิทธิชัย รอดคุ้ม (พี่แมว)</p>
               <p class="text-[10px] text-stone-500">นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนฯ</p>
@@ -1398,7 +1450,7 @@
           </div>
 
           <!-- 3: รักษาการ ลำดับ 3 (พี่แป๊ะ) -->
-          <div onclick="selectSignatoryOption('นายปรัชญา เชาวสุธีรนนท์', 'นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รักษาการในตำแหน่ง หน.ฝ่ายฯ ลำดับที่ 3 (พี่แป๊ะ)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('head', 'นายปรัชญา เชาวสุธีรนนท์', 'นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รรท. หน.ฝ่ายฯ (พี่แป๊ะ)', 'รักษาการ ลำดับ 3')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">3. นายปรัชญา เชาวสุธีรนนท์ (พี่แป๊ะ)</p>
               <p class="text-[10px] text-stone-500">นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนฯ</p>
@@ -1407,7 +1459,7 @@
           </div>
 
           <!-- 4: รักษาการ ลำดับ 4 (พี่ขวัญ) -->
-          <div onclick="selectSignatoryOption('นางสาวสรัญญา บุญมี', 'นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รักษาการในตำแหน่ง หน.ฝ่ายฯ ลำดับที่ 4 (พี่ขวัญ)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('head', 'นางสาวสรัญญา บุญมี', 'นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รรท. หน.ฝ่ายฯ (พี่ขวัญ)', 'รักษาการ ลำดับ 4')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">4. นางสาวสรัญญา บุญมี (พี่ขวัญ)</p>
               <p class="text-[10px] text-stone-500">นักพัฒนาสังคมปฏิบัติการ รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนฯ</p>
@@ -1416,7 +1468,7 @@
           </div>
 
           <!-- 5: รักษาการ ลำดับ 5 (พี่มุก) -->
-          <div onclick="selectSignatoryOption('นางสาวพรนิตา ทองทุ้ย', 'เจ้าพนักงานธุรการปฏิบัติงาน รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รักษาการในตำแหน่ง หน.ฝ่ายฯ ลำดับที่ 5 (พี่มุก)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('head', 'นางสาวพรนิตา ทองทุ้ย', 'เจ้าพนักงานธุรการปฏิบัติงาน รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม', 'รรท. หน.ฝ่ายฯ (พี่มุก)', 'รักษาการ ลำดับ 5')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">5. นางสาวพรนิตา ทองทุ้ย (พี่มุก)</p>
               <p class="text-[10px] text-stone-500">เจ้าพนักงานธุรการปฏิบัติงาน รักษาการในตำแหน่งหัวหน้าฝ่ายพัฒนาชุมชนฯ</p>
@@ -1426,24 +1478,24 @@
         </div>
       </div>
 
-      <!-- Section 2: นอกเวลาราชการ / วันหยุด (ผู้บริหารระดับเขต) -->
+      <!-- Section 2: ผู้มีอำนาจอนุมัติระดับเขต (นอกเวลาราชการ / วันหยุด) -->
       <div class="space-y-2 pt-2 border-t border-[#f0e8dc]">
         <div class="flex items-center space-x-1.5 text-xs font-bold text-amber-900">
           <i class="fa-solid fa-landmark text-amber-600"></i>
-          <span>2. นอกเวลาราชการ / วันหยุด — ผู้อำนวยการเขต และผู้ช่วย ผอ.เขต</span>
+          <span>2. ผู้มีอำนาจอนุมัติระดับเขต (นอกเวลาราชการ / วันหยุด) — ผอ.เขต และผู้ช่วย ผอ.เขต</span>
         </div>
         <div class="space-y-1.5 text-xs">
           <!-- ผอ.เขต ตัวจริง -->
-          <div onclick="selectSignatoryOption('นายบำรุง สำเนียงงาม', 'ผู้อำนวยการเขตคลองเตย', 'ผู้อำนวยการเขตคลองเตย (ค่าเริ่มต้นนอกเวลา)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('approver', 'นายบำรุง สำเนียงงาม', 'ผู้อำนวยการเขตคลองเตย', 'ผู้อำนวยการเขตคลองเตย (ค่าเริ่มต้นนอกเวลา)', 'ผอ.เขต ตัวจริง')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">นายบำรุง สำเนียงงาม</p>
               <p class="text-[10px] text-stone-500">ผู้อำนวยการเขตคลองเตย</p>
             </div>
-            <span class="px-2 py-0.5 text-[9px] bg-amber-100 text-amber-800 rounded font-bold">ค่าเริ่มต้นนอกเวลา</span>
+            <span class="px-2 py-0.5 text-[9px] bg-amber-100 text-amber-800 rounded font-bold">ผอ.เขต ตัวจริง</span>
           </div>
 
           <!-- ผู้ช่วย ผอ. ลำดับ 1 (นายแหวน) -->
-          <div onclick="selectSignatoryOption('นายแหวน เพ็ชรตะกั่ว', 'ผู้ช่วยผู้อำนวยการเขต รักษาราชการแทน ผู้อำนวยการเขตคลองเตย', 'รักษาราชการแทน ผอ.เขต (ผู้ช่วยฯ แหวน)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('approver', 'นายแหวน เพ็ชรตะกั่ว', 'ผู้ช่วยผู้อำนวยการเขต รักษาราชการแทน ผู้อำนวยการเขตคลองเตย', 'รรท. ผอ.เขต (ผู้ช่วยฯ แหวน)', 'รรท. ผอ. ลำดับ 1')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">นายแหวน เพ็ชรตะกั่ว</p>
               <p class="text-[10px] text-stone-500">ผู้ช่วยผู้อำนวยการเขต รักษาราชการแทน ผู้อำนวยการเขตคลองเตย</p>
@@ -1452,7 +1504,7 @@
           </div>
 
           <!-- ผู้ช่วย ผอ. ลำดับ 2 (นายเจษฎา) -->
-          <div onclick="selectSignatoryOption('นายเจษฎา ศรีกรการ', 'ผู้ช่วยผู้อำนวยการเขต รักษาราชการแทน ผู้อำนวยการเขตคลองเตย', 'รักษาราชการแทน ผอ.เขต (ผู้ช่วยฯ เจษฎา)')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
+          <div onclick="selectSignatoryOption('approver', 'นายเจษฎา ศรีกรการ', 'ผู้ช่วยผู้อำนวยการเขต รักษาราชการแทน ผู้อำนวยการเขตคลองเตย', 'รรท. ผอ.เขต (ผู้ช่วยฯ เจษฎา)', 'รรท. ผอ. ลำดับ 2')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
             <div>
               <p class="font-bold text-stone-900">นายเจษฎา ศรีกรการ</p>
               <p class="text-[10px] text-stone-500">ผู้ช่วยผู้อำนวยการเขต รักษาราชการแทน ผู้อำนวยการเขตคลองเตย</p>
@@ -1548,9 +1600,7 @@
   let pendingAssignments = {}; // reqId -> { carPlate, driverName, type }
   const LIFF_ID = '2011779092-i5rhj1mo';
 
-  let isSignatoryManuallyOverridden = false;
-  let manualSignatoryData = null;
-  let adminProxyMode = 'self';
+    let adminProxyMode = 'self';
 
   // 🔍 ถอดรหัสหาหน้าที่ต้องการเปิดอย่างแม่นยำ
   function getTargetPageFromUrl() {
@@ -1897,6 +1947,69 @@
   // ══════════════════════════════════════════════════════════════
   // SMART SIGNATORY CALCULATION (08:00 - 16:00 RULE)
   // ══════════════════════════════════════════════════════════════
+  // 📸 ระบบจัดการรูปถ่ายหลายรูป (Multi-Photo)
+  let uploadedDocPhotos = [];
+
+  async function handleDocFilesSelected(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        const b64 = await readFileAsBase64(file);
+        uploadedDocPhotos.push({
+          id: 'photo_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+          file: file,
+          base64: b64,
+          name: file.name
+        });
+      } catch (err) {
+        console.error('Error reading file:', err);
+      }
+    }
+    renderDocPhotosGallery();
+    event.target.value = '';
+  }
+
+  function removeDocPhoto(photoId) {
+    uploadedDocPhotos = uploadedDocPhotos.filter(p => p.id !== photoId);
+    renderDocPhotosGallery();
+  }
+
+  function renderDocPhotosGallery() {
+    const gallery = document.getElementById('req-photo-preview-gallery');
+    const badge = document.getElementById('req-photo-count-badge');
+    if (!gallery) return;
+
+    if (uploadedDocPhotos.length === 0) {
+      gallery.classList.add('hidden');
+      gallery.innerHTML = '';
+      if (badge) badge.classList.add('hidden');
+      return;
+    }
+
+    gallery.classList.remove('hidden');
+    if (badge) {
+      badge.classList.remove('hidden');
+      badge.innerText = uploadedDocPhotos.length + ' รูปที่แนบ';
+    }
+
+    gallery.innerHTML = uploadedDocPhotos.map((p, idx) => 
+      '<div class="relative group rounded-xl overflow-hidden border border-[#d8cfbe] bg-stone-100 aspect-square shadow-sm">' +
+        '<img src="' + p.base64 + '" class="w-full h-full object-cover" alt="รูปที่ ' + (idx + 1) + '">' +
+        '<span class="absolute bottom-1 left-1 bg-stone-900/80 text-white text-[9px] px-1.5 py-0.5 rounded font-mono">รูปที่ ' + (idx + 1) + '</span>' +
+        '<button type="button" onclick="removeDocPhoto(\'' + p.id + '\')" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center text-[10px] shadow transition" title="ลบรูปนี้">' +
+          '<i class="fa-solid fa-xmark"></i>' +
+        '</button>' +
+      '</div>'
+    ).join('');
+  }
+
+  // ✍️ สายการเสนอลงนาม 08:00 - 16:00
+  let isSignatoryManuallyOverridden = false;
+  let manualSignatoryData = null;
+
   function recalculateSignatory() {
     if (isSignatoryManuallyOverridden && manualSignatoryData) {
       renderSignatoryDisplay(manualSignatoryData, true);
@@ -1940,8 +2053,12 @@
         isOutside: true,
         badgeText: '🏛️ นอกเวลาราชการ / วันหยุด • เสนอ ผอ.เขต อนุมัติ',
         badgeClass: 'bg-amber-100 text-amber-900 border border-amber-300',
+        headName: 'นางสาวภริตพร หมื่นสม',
+        headPos: 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม',
+        headBadge: 'ผู้เสนอขอใช้รถ',
         approverName: 'นายบำรุง สำเนียงงาม',
         approverPos: 'ผู้อำนวยการเขตคลองเตย',
+        approverBadge: 'เสนอ ผอ.เขต อนุมัติ',
         noteText: '* เดินทางนอกเวลาราชการ (ก่อน 08.00 น. หรือหลัง 16.00 น.) หรือวันหยุด ต้องเสนอ ผอ.เขต อนุมัติ'
       };
     } else {
@@ -1949,8 +2066,12 @@
         isOutside: false,
         badgeText: '🌿 ในเวลาราชการ (08.00 - 16.00 น.) • อนุมัติในฝ่าย',
         badgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+        headName: 'นางสาวภริตพร หมื่นสม',
+        headPos: 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม',
+        headBadge: 'ตัวจริง',
         approverName: 'นางสาวภริตพร หมื่นสม',
         approverPos: 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม',
+        approverBadge: 'อนุมัติในฝ่าย (08.00 - 16.00 น.)',
         noteText: '* เดินทางในวันและเวลาราชการปกติ (08.00 - 16.00 น.) หัวหน้าฝ่ายฯ มีอำนาจอนุมัติจบในฝ่าย'
       };
     }
@@ -1960,16 +2081,30 @@
 
   function renderSignatoryDisplay(data, isOverridden) {
     const badgeEl = document.getElementById('signatory-badge');
-    const nameEl = document.getElementById('signatory-approver-display');
-    const posEl = document.getElementById('signatory-pos-display');
+    const headNameEl = document.getElementById('sig-head-name');
+    const headPosEl = document.getElementById('sig-head-pos');
+    const headBadgeEl = document.getElementById('sig-head-badge');
+
+    const appNameEl = document.getElementById('sig-approver-name');
+    const appPosEl = document.getElementById('sig-approver-pos');
+    const appBadgeEl = document.getElementById('sig-approver-badge');
+
     const noteEl = document.getElementById('signatory-mode-note');
     const resetBtn = document.getElementById('btn-reset-signatory');
 
-    const hiddenName = document.getElementById('req-signatory-name');
-    const hiddenPos = document.getElementById('req-signatory-pos');
+    const hiddenSignatoryName = document.getElementById('req-signatory-name');
+    const hiddenSignatoryPos = document.getElementById('req-signatory-pos');
+    const hiddenHeadName = document.getElementById('req-head-name');
+    const hiddenHeadPos = document.getElementById('req-head-pos');
+    const hiddenApproverName = document.getElementById('req-approver-name');
+    const hiddenApproverPos = document.getElementById('req-approver-pos');
 
-    if (hiddenName) hiddenName.value = data.approverName;
-    if (hiddenPos) hiddenPos.value = data.approverPos;
+    if (hiddenSignatoryName) hiddenSignatoryName.value = data.approverName;
+    if (hiddenSignatoryPos) hiddenSignatoryPos.value = data.approverPos;
+    if (hiddenHeadName) hiddenHeadName.value = data.headName || 'นางสาวภริตพร หมื่นสม';
+    if (hiddenHeadPos) hiddenHeadPos.value = data.headPos || 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม';
+    if (hiddenApproverName) hiddenApproverName.value = data.approverName;
+    if (hiddenApproverPos) hiddenApproverPos.value = data.approverPos;
 
     if (badgeEl) {
       if (isOverridden) {
@@ -1981,12 +2116,28 @@
       }
     }
 
-    if (nameEl) {
-      nameEl.innerHTML = '<span class="text-stone-500 font-normal">ผู้อนุมัติ:</span> ' + data.approverName;
+    if (headNameEl) headNameEl.innerText = data.headName || 'นางสาวภริตพร หมื่นสม';
+    if (headPosEl) headPosEl.innerText = data.headPos || 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม';
+    if (headBadgeEl) {
+      headBadgeEl.innerText = data.headBadge || 'ตัวจริง';
+      if (data.headBadge && data.headBadge.includes('รักษาการ')) {
+        headBadgeEl.className = 'px-1.5 py-0.2 text-[9px] bg-purple-100 text-purple-800 rounded font-bold';
+      } else {
+        headBadgeEl.className = 'px-1.5 py-0.2 text-[9px] bg-emerald-100 text-emerald-800 rounded font-bold';
+      }
     }
-    if (posEl) {
-      posEl.innerText = data.approverPos;
+
+    if (appNameEl) appNameEl.innerText = data.approverName;
+    if (appPosEl) appPosEl.innerText = data.approverPos;
+    if (appBadgeEl) {
+      appBadgeEl.innerText = data.approverBadge || 'ผู้อนุมัติ';
+      if (data.isOutside) {
+        appBadgeEl.className = 'px-1.5 py-0.2 text-[9px] bg-amber-100 text-amber-800 rounded font-bold';
+      } else {
+        appBadgeEl.className = 'px-1.5 py-0.2 text-[9px] bg-emerald-100 text-emerald-800 rounded font-bold';
+      }
     }
+
     if (noteEl) {
       noteEl.innerText = isOverridden ? ('* ' + (data.noteText || 'กำหนดผู้ลงนามแทนพิเศษโดยผู้ยื่นคำขอ')) : data.noteText;
     }
@@ -2003,18 +2154,44 @@
     openModal('modal-signatory-override');
   }
 
-  function selectSignatoryOption(name, position, note) {
+  function selectSignatoryOption(type, name, position, note, badge) {
     isSignatoryManuallyOverridden = true;
-    manualSignatoryData = {
-      approverName: name,
-      approverPos: position,
-      noteText: note,
+    
+    // ดึงค่าปัจจุบัน
+    let currentData = manualSignatoryData || {
+      isOutside: false,
       badgeText: 'กำหนดผู้ลงนามแทนพิเศษ',
-      badgeClass: 'bg-purple-100 text-purple-900 border border-purple-300'
+      badgeClass: 'bg-purple-100 text-purple-900 border border-purple-300',
+      headName: document.getElementById('sig-head-name') ? document.getElementById('sig-head-name').innerText : 'นางสาวภริตพร หมื่นสม',
+      headPos: document.getElementById('sig-head-pos') ? document.getElementById('sig-head-pos').innerText : 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม',
+      headBadge: 'ตัวจริง',
+      approverName: document.getElementById('sig-approver-name') ? document.getElementById('sig-approver-name').innerText : 'นางสาวภริตพร หมื่นสม',
+      approverPos: document.getElementById('sig-approver-pos') ? document.getElementById('sig-approver-pos').innerText : 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม',
+      approverBadge: 'อนุมัติในฝ่าย',
+      noteText: note
     };
+
+    if (type === 'head') {
+      currentData.headName = name;
+      currentData.headPos = position;
+      currentData.headBadge = badge || 'รักษาการ';
+      // ถ้าเป็นการเดินทางในเวลา ผู้อนุมัติคือผู้ที่ทำหน้าที่หัวหน้าฝ่ายด้วย
+      if (!currentData.isOutside) {
+        currentData.approverName = name;
+        currentData.approverPos = position;
+        currentData.approverBadge = 'อนุมัติในฝ่าย (รรท.)';
+      }
+    } else if (type === 'approver') {
+      currentData.approverName = name;
+      currentData.approverPos = position;
+      currentData.approverBadge = badge || 'ผู้อนุมัติ';
+    }
+
+    currentData.noteText = note;
+    manualSignatoryData = currentData;
     renderSignatoryDisplay(manualSignatoryData, true);
     closeModal('modal-signatory-override');
-    showToast('เปลี่ยนผู้มีอำนาจลงนามเป็น: ' + name, 'info');
+    showToast('ปรับปรุงผู้ลงนาม: ' + name, 'info');
   }
 
   function resetSignatoryOverride() {
@@ -2025,7 +2202,6 @@
     showToast('คืนค่าผู้มีอำนาจลงนามตามระบบคำนวณอัตโนมัติแล้ว', 'success');
   }
 
-  // ══════════════════════════════════════════════════════════════
   // ADMIN MEMBERS MANAGEMENT
   // ══════════════════════════════════════════════════════════════
   let allAdminMembersList = [];
@@ -2355,12 +2531,8 @@
     const signatoryName = document.getElementById('req-signatory-name') ? document.getElementById('req-signatory-name').value.trim() : 'นางสาวภริตพร หมื่นสม';
     const signatoryPos = document.getElementById('req-signatory-pos') ? document.getElementById('req-signatory-pos').value.trim() : 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม';
 
-    // แนบรูปถ่ายถ้ามี
-    const docFile = document.getElementById('req-doc-file') ? document.getElementById('req-doc-file').files[0] : null;
-    let docBase64 = '';
-    if (docFile && docChoice === 'written') {
-      docBase64 = await readFileAsBase64(docFile);
-    }
+    // รูปถ่ายหลายรูป (Multi-Photo)
+    const docPhotosBase64 = (docChoice === 'written') ? uploadedDocPhotos.map(p => p.base64) : [];
 
     // รายการวันเดินทาง
     let multiDayList = [];
@@ -2392,7 +2564,8 @@
       signatoryName: signatoryName,
       signatoryPos: signatoryPos,
       pendingDoc: (docChoice === 'written') && document.getElementById('req-pending-doc') ? document.getElementById('req-pending-doc').checked : false,
-      docImageBase64: docBase64,
+      docImagesBase64: docPhotosBase64,
+      docImageBase64: docPhotosBase64.length > 0 ? docPhotosBase64[0] : '',
       date: document.getElementById('req-date').value,
       timeStart: document.getElementById('req-time-start').value,
       timeEnd: document.getElementById('req-time-end').value,
@@ -2407,6 +2580,8 @@
         showToast(res.message || 'ส่งคำขอเรียบร้อยแล้ว!', 'success');
         document.getElementById('form-request').reset();
         toggleMultiDay(false);
+        uploadedDocPhotos = [];
+        renderDocPhotosGallery();
         // คืนค่าผู้ขอ
         if (currentMember) setupRequesterDisplay(currentMember);
         recalculateSignatory();
@@ -2604,7 +2779,9 @@
     container.innerHTML = '<div class="text-center py-12 text-stone-400 text-xs"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-amber-600"></i><p>กำลังโหลดคำขอของคุณ...</p></div>';
 
     const uid = (currentUser && currentUser.userId) ? currentUser.userId : (localStorage.getItem('user_line_id') || '');
-    callBackend('apiGetMyRequests', { userId: uid }, res => {
+    const uName = (currentUser && currentUser.name) ? currentUser.name : (localStorage.getItem('user_full_name') || '');
+
+    callBackend('apiGetMyRequests', { userId: uid, requesterName: uName }, res => {
       if (res && res.success && Array.isArray(res.requests) && res.requests.length > 0) {
         container.innerHTML = '';
         res.requests.forEach(r => {
@@ -2618,24 +2795,42 @@
             statusBadge = '<span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-rose-100 text-rose-800 border border-rose-200">ยกเลิก/ปฏิเสธ</span>';
           }
 
+          // ตรวจสอบรูปภาพที่แนบ (อาจมีหลายรูป)
+          let photosHtml = '';
+          if (r.docImgUrl) {
+            const urls = r.docImgUrl.split(',').map(u => u.trim()).filter(Boolean);
+            if (urls.length === 1) {
+              photosHtml = '<a href="' + urls[0] + '" target="_blank" class="px-2.5 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-lg font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-image"></i> <span>รูปใบใช้รถ</span></a>';
+            } else if (urls.length > 1) {
+              photosHtml = urls.map((u, idx) => 
+                '<a href="' + u + '" target="_blank" class="px-2 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-lg font-semibold transition flex items-center space-x-1 text-[11px]"><i class="fa-solid fa-image"></i> <span>รูปที่ ' + (idx + 1) + '</span></a>'
+              ).join(' ');
+            }
+          }
+
+          const travelDateStr = r.travelDate || r.dateThai || r.date || '-';
+          const assignedCarStr = r.assignedCar || r.carPlate || '';
+          const assignedDriverStr = r.assignedDriver || r.driverName || '';
+
           card.innerHTML = 
             '<div class="flex items-center justify-between border-b border-[#f0e8dc] pb-2.5">' +
               '<div class="flex items-center space-x-2">' +
                 '<span class="font-mono text-xs font-bold text-stone-900">' + r.reqId + '</span>' +
                 statusBadge +
               '</div>' +
-              '<span class="text-[10px] text-stone-400">' + r.timestamp + '</span>' +
+              '<span class="text-[10px] text-stone-400">' + (r.timestamp || r.submittedAt || '') + '</span>' +
             '</div>' +
             '<div class="space-y-1 text-xs text-stone-700">' +
-              '<p>📍 <strong>ปลายทาง:</strong> ' + r.destination + '</p>' +
-              '<p>🎯 <strong>วัตถุประสงค์:</strong> ' + r.purpose + '</p>' +
-              '<p>📅 <strong>วันเวลา:</strong> ' + r.travelDate + ' (' + r.timeStart + ' - ' + r.timeEnd + ' น.)</p>' +
-              (r.assignedCar ? ('<p class="text-emerald-700 font-semibold">🚗 รถที่จัดให้: ' + r.assignedCar + ' (' + (r.assignedDriver || '-') + ')</p>') : '') +
+              '<p>📍 <strong>ปลายทาง:</strong> ' + (r.destination || '-') + '</p>' +
+              '<p>🎯 <strong>วัตถุประสงค์:</strong> ' + (r.purpose || '-') + '</p>' +
+              '<p>📅 <strong>วันเวลา:</strong> ' + travelDateStr + ' (' + (r.timeStart || '') + ' - ' + (r.timeEnd || '') + ' น.)</p>' +
+              (assignedCarStr ? ('<p class="text-emerald-700 font-semibold">🚗 รถที่จัดให้: ' + assignedCarStr + ' (' + (assignedDriverStr || '-') + ')</p>') : '') +
             '</div>' +
             '<div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#f0e8dc] text-xs">' +
-              '<div class="flex items-center space-x-2">' +
+              '<div class="flex flex-wrap items-center gap-1.5">' +
                 (r.docWordUrl ? ('<a href="' + r.docWordUrl + '" target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-file-word"></i> <span>Word</span></a>') : '') +
                 (r.docPdfUrl ? ('<a href="' + r.docPdfUrl + '" target="_blank" class="px-2.5 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-file-pdf"></i> <span>PDF</span></a>') : '') +
+                photosHtml +
               '</div>' +
               (r.status === 'pending' ? ('<button onclick="cancelMyReq(\'' + r.reqId + '\')" class="text-rose-600 hover:text-rose-800 text-[11px] font-semibold"><i class="fa-solid fa-ban mr-1"></i> ยกเลิกคำขอนี้</button>') : '') +
             '</div>';
