@@ -61,6 +61,42 @@
     input, select, textarea {
       font-family: 'Prompt', sans-serif;
     }
+  
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+        padding: 0 !important;
+      }
+      body * {
+        visibility: hidden;
+      }
+      #modal-voucher-preview, #modal-voucher-preview * {
+        visibility: visible;
+      }
+      #modal-voucher-preview {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+      #printable-voucher {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 10mm 15mm !important;
+      }
+      .print\:hidden {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
 <body class="min-h-screen pb-16 text-stone-800 bg-[#faf7f2]">
@@ -84,14 +120,14 @@
 
       <!-- User Status & Control -->
       <div class="flex items-center space-x-2">
-        <div id="user-display-pill" class="flex items-center space-x-2 px-2.5 py-1 bg-white/90 border border-[#e2d8c8] rounded-xl text-xs text-stone-700 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <div id="user-display-pill" onclick="handleUserPillClick()" class="flex items-center space-x-2 px-2.5 py-1 bg-white/90 border border-[#e2d8c8] hover:border-amber-400 rounded-xl text-xs text-stone-700 shadow-sm cursor-pointer transition" title="คลิกเพื่อดูโปรไฟล์หรือสลับบัญชี">
+          <span id="user-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <div class="text-right leading-tight">
-            <p id="user-display-name" class="font-bold text-stone-800 text-[11px] truncate max-w-[120px] sm:max-w-[180px]">ผู้ใช้งานทั่วไป</p>
-            <p id="user-display-role" class="text-[9px] text-stone-500 font-medium">รอโหลดข้อมูล...</p>
+            <p id="user-display-name" class="font-bold text-stone-800 text-[11px] truncate max-w-[110px] sm:max-w-[170px]">ผู้ใช้งานทั่วไป</p>
+            <p id="user-display-role" class="text-[9px] text-stone-500 font-medium">คลิกเพื่อเข้าสู่ระบบ</p>
           </div>
         </div>
-        <button onclick="handleLogout()" id="btn-logout" class="hidden p-1.5 text-xs text-stone-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="ออกจากระบบ">
+        <button onclick="logoutUser()" id="btn-logout-user" class="hidden p-1.5 text-xs text-stone-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition" title="ออกจากระบบ / สลับเบอร์โทร">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
         </button>
         <button onclick="closeLiffWindow()" class="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-200/50 rounded-lg text-xs transition" title="ปิดหน้าต่าง">
@@ -461,7 +497,8 @@
             </div>
             <div>
               <label class="block font-semibold text-stone-700 mb-1">จำนวนผู้โดยสาร (คน) <span class="text-rose-500">*</span></label>
-              <input type="number" id="req-passengers" min="1" max="15" value="1" required class="w-full px-3 py-2.5 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 font-medium">
+              <input type="number" id="req-passengers" min="1" max="30" value="1" required class="w-full px-3 py-2.5 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 font-medium">
+              <p class="text-[10px] text-stone-400 mt-0.5"><i class="fa-solid fa-users mr-1"></i> รองรับสูงสุด 30 คน (สำหรับเดินทางเป็นหมู่คณะหรือจัดรถหลายคัน)</p>
             </div>
           </div>
 
@@ -475,12 +512,20 @@
           <!-- ══════════════════════════════════════════════════════════ -->
           <div>
             <label class="block font-semibold text-stone-700 mb-1">สถานที่ปลายทาง (ไปที่ไหน) <span class="text-rose-500">*</span></label>
-            <input type="text" id="req-destination" required placeholder="เช่น ศาลาว่าการกรุงเทพมหานคร 2 (ดินแดง)" class="w-full px-3 py-2.5 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+            <input type="text" id="req-destination" required maxlength="80" oninput="updateCharCount('req-destination', 'dest-counter', 80)" placeholder="เช่น ศาลาว่าการกรุงเทพมหานคร 2 (ดินแดง)" class="w-full px-3 py-2.5 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+            <div class="flex justify-between items-center text-[10px] text-stone-400 mt-0.5">
+              <span>ระบุจุดหมายปลายทางให้ชัดเจนและกระชับ</span>
+              <span id="dest-counter" class="font-mono">0/80 ตัวอักษร</span>
+            </div>
           </div>
 
           <div>
             <label class="block font-semibold text-stone-700 mb-1">วัตถุประสงค์ในการขอใช้รถ (เพื่ออะไร) <span class="text-rose-500">*</span></label>
-            <textarea id="req-purpose" rows="2" required placeholder="ระบุภารกิจหรือวัตถุประสงค์ในการเดินทาง" class="w-full px-3 py-2 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500"></textarea>
+            <textarea id="req-purpose" rows="2" required maxlength="120" oninput="updateCharCount('req-purpose', 'purpose-counter', 120)" placeholder="ระบุภารกิจหรือวัตถุประสงค์ในการเดินทางโดยกระชับ" class="w-full px-3 py-2 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-800 focus:bg-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500"></textarea>
+            <div class="flex justify-between items-center text-[10px] text-stone-400 mt-0.5">
+              <span>ระบุวัตถุประสงค์ไม่เกิน 120 ตัวอักษร เพื่อให้ฟอร์มจัดหน้า 1 หน้าพอดี</span>
+              <span id="purpose-counter" class="font-mono">0/120 ตัวอักษร</span>
+            </div>
           </div>
 
           <!-- ══════════════════════════════════════════════════════════ -->
@@ -726,7 +771,8 @@
             </div>
             <div>
               <label class="block font-semibold text-slate-700 mb-1">จำนวนผู้โดยสาร (คน) <span class="text-rose-500">*</span></label>
-              <input type="number" id="borrow-passengers" min="1" max="15" value="1" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              <input type="number" id="borrow-passengers" min="1" max="30" value="1" required class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              <p class="text-[10px] text-slate-400 mt-0.5"><i class="fa-solid fa-users mr-1"></i> รองรับสูงสุด 30 คน</p>
             </div>
           </div>
 
@@ -805,20 +851,92 @@
         </form>
       </div>
     </section><section id="page-my_requests" class="hidden space-y-4">
-      <div class="flex items-center justify-between">
+      <!-- Header -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-[#e8decb] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-base sm:text-lg font-bold font-heading text-slate-800">📋 คำขอใช้รถของฉัน</h2>
-          <p class="text-xs text-slate-500">ตรวจสอบสถานะการจัดคิว และดาวน์โหลดใบขอใช้รถ Word / PDF</p>
+          <div class="flex items-center space-x-2">
+            <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-clipboard-list"></i>
+            </span>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold font-heading text-stone-900">📋 คำขอใช้รถของฉัน</h2>
+              <p class="text-xs text-stone-500">ติดตามสถานะการจัดคิว การรวมคิว (Car Pool) และพิมพ์ใบใช้รถ (แบบ ๓) ย้อนหลัง</p>
+            </div>
+          </div>
         </div>
-        <button onclick="loadMyRequests()" class="px-3 py-1.5 text-xs bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl transition flex items-center space-x-1 shadow-sm">
-          <i class="fa-solid fa-arrows-rotate"></i>
-          <span>รีเฟรช</span>
-        </button>
+        <div class="flex items-center space-x-2">
+          <button onclick="loadMyRequests()" class="px-3 py-2 text-xs font-semibold bg-[#faf7f2] hover:bg-[#efe7d8] border border-[#dcd3c3] text-stone-800 rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>รีเฟรชข้อมูล</span>
+          </button>
+        </div>
       </div>
 
+      <!-- Filter Controls Card -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-[#e8decb] space-y-3 text-xs">
+        <!-- Row 1: Status Filter Pills -->
+        <div>
+          <span class="block text-[11px] font-bold text-stone-600 mb-1.5">สถานะคำขอ:</span>
+          <div class="flex items-center space-x-1.5 overflow-x-auto hide-scrollbar pb-1">
+            <button type="button" onclick="setReqStatusFilter('all')" id="rf-status-all" class="px-3 py-1.5 rounded-xl whitespace-nowrap font-medium transition bg-amber-600 text-white shadow-sm">
+              ทั้งหมด <span id="rf-cnt-all" class="ml-1 px-1.5 py-0.2 rounded-full bg-white/20 text-[10px]">0</span>
+            </button>
+            <button type="button" onclick="setReqStatusFilter('pending')" id="rf-status-pending" class="px-3 py-1.5 rounded-xl whitespace-nowrap font-medium transition bg-[#faf7f2] text-stone-700 hover:bg-[#efe7d8] border border-[#e2d8c8]">
+              ⏳ รอจัดคิว <span id="rf-cnt-pending" class="ml-1 px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[10px]">0</span>
+            </button>
+            <button type="button" onclick="setReqStatusFilter('assigned')" id="rf-status-assigned" class="px-3 py-1.5 rounded-xl whitespace-nowrap font-medium transition bg-[#faf7f2] text-stone-700 hover:bg-[#efe7d8] border border-[#e2d8c8]">
+              ✅ จัดคิวแล้ว <span id="rf-cnt-assigned" class="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px]">0</span>
+            </button>
+            <button type="button" onclick="setReqStatusFilter('pooled')" id="rf-status-pooled" class="px-3 py-1.5 rounded-xl whitespace-nowrap font-medium transition bg-[#faf7f2] text-stone-700 hover:bg-[#efe7d8] border border-[#e2d8c8]">
+              🔄 รวมคิว (Car Pool) <span id="rf-cnt-pooled" class="ml-1 px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-800 text-[10px]">0</span>
+            </button>
+            <button type="button" onclick="setReqStatusFilter('cancelled')" id="rf-status-cancelled" class="px-3 py-1.5 rounded-xl whitespace-nowrap font-medium transition bg-[#faf7f2] text-stone-700 hover:bg-[#efe7d8] border border-[#e2d8c8]">
+              🚫 ยกเลิก/ปฏิเสธ <span id="rf-cnt-cancelled" class="ml-1 px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-800 text-[10px]">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 2: Period Filter Pills -->
+        <div class="pt-2 border-t border-[#f0e8dc]">
+          <span class="block text-[11px] font-bold text-stone-600 mb-1.5">ช่วงเวลาเดินทาง:</span>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" onclick="setReqPeriodFilter('all')" id="rf-period-all" class="px-2.5 py-1 rounded-lg text-xs font-medium transition bg-amber-600 text-white">
+              ทั้งหมด
+            </button>
+            <button type="button" onclick="setReqPeriodFilter('week')" id="rf-period-week" class="px-2.5 py-1 rounded-lg text-xs font-medium transition bg-[#faf7f2] text-stone-700 hover:bg-[#efe7d8] border border-[#e2d8c8]">
+              สัปดาห์นี้
+            </button>
+            <button type="button" onclick="setReqPeriodFilter('month')" id="rf-period-month" class="px-2.5 py-1 rounded-lg text-xs font-medium transition bg-[#faf7f2] text-stone-700 hover:bg-[#efe7d8] border border-[#e2d8c8]">
+              เดือนนี้
+            </button>
+            <button type="button" onclick="setReqPeriodFilter('custom')" id="rf-period-custom" class="px-2.5 py-1 rounded-lg text-xs font-medium transition bg-[#faf7f2] text-stone-700 hover:bg-[#efe7d8] border border-[#e2d8c8]">
+              <i class="fa-solid fa-calendar-days mr-1"></i> กำหนดช่วงวันที่เอง
+            </button>
+          </div>
+
+          <!-- Custom Date Range Row -->
+          <div id="rf-custom-date-box" class="hidden mt-2 p-2.5 bg-[#faf7f2] rounded-xl border border-[#e5dcce] grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+            <div>
+              <label class="block text-[10px] text-stone-500 mb-0.5">ตั้งแต่วันที่:</label>
+              <input type="date" id="rf-start-date" class="w-full px-2.5 py-1.5 bg-white border border-[#dcd3c3] rounded-lg text-xs">
+            </div>
+            <div>
+              <label class="block text-[10px] text-stone-500 mb-0.5">ถึงวันที่:</label>
+              <input type="date" id="rf-end-date" class="w-full px-2.5 py-1.5 bg-white border border-[#dcd3c3] rounded-lg text-xs">
+            </div>
+            <div class="sm:pt-4">
+              <button type="button" onclick="applyCustomDateFilter()" class="w-full py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold transition text-xs">
+                กรองข้อมูล
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Requests Cards List Container -->
       <div id="my-requests-list" class="space-y-3">
-        <div class="text-center py-12 text-slate-400 text-xs">
-          <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-slate-300"></i>
+        <div class="text-center py-12 text-stone-400 text-xs bg-white rounded-2xl border border-[#e8decb]">
+          <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-amber-600"></i>
           <p>กำลังค้นหาคำขอของคุณ...</p>
         </div>
       </div>
@@ -1387,6 +1505,170 @@
   </div>
 
   <!-- MODAL: เปลี่ยนผู้มีอำนาจลงนาม (กรณีหัวหน้าฝ่ายฯ หรือ ผอ.เขต ไม่อยู่) -->
+  
+  <!-- MODAL: เข้าสู่ระบบด้วยเบอร์โทรศัพท์ / บุคลากรฝ่ายพัฒนาชุมชนฯ (PC Mode) -->
+  <div id="modal-phone-login" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 border border-[#e8decb]">
+      <div class="flex items-center justify-between border-b border-[#f0e8dc] pb-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-base">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-stone-900 font-heading">เข้าสู่ระบบการใช้งาน</h3>
+            <p class="text-[10px] text-stone-500">สำหรับใช้งานบนคอมพิวเตอร์ / บราวเซอร์</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-phone-login')" class="text-stone-400 hover:text-stone-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Quick Roster Login for 15 Department Personnel -->
+      <div class="p-3 bg-[#fdfbf7] rounded-xl border border-[#ede5d8] space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-stone-800 flex items-center space-x-1.5">
+            <i class="fa-solid fa-id-card text-amber-600"></i>
+            <span>เข้าสู่ระบบด่วน (บุคลากร 15 ท่าน):</span>
+          </label>
+          <span class="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded font-medium">1 คลิก</span>
+        </div>
+        <select id="quick-roster-login-select" onchange="handleQuickRosterSelect(this.value)" class="w-full px-3 py-2 bg-white border border-[#dcd3c3] rounded-xl text-xs font-semibold text-stone-800 focus:border-amber-500 focus:outline-none">
+          <option value="">-- เลือกชื่อของท่านเพื่อเข้าสู่ระบบทันที --</option>
+          <option value="082-353-4141">1. นางสาวภริตพร หมื่นสม (พี่ฝน) - หน.ฝ่ายพัฒนาชุมชนฯ</option>
+          <option value="086-567-1075">2. นางสาววิภารัตน์ เหล็งสา (พี่มิ้น) - รรท.หน.ฝ่ายฯ ลำดับ 1</option>
+          <option value="083-022-0254">3. นายสิทธิชัย รอดคุ้ม (พี่แมว) - รรท.หน.ฝ่ายฯ ลำดับ 2</option>
+          <option value="083-220-6421">4. นายปรัชญา เชาวสุธีรนนท์ (พี่แป๊ะ) - รรท.หน.ฝ่ายฯ ลำดับ 3</option>
+          <option value="062-939-5145">5. นางสาวสรัญญา บุญมี (พี่ขวัญ) - รรท.หน.ฝ่ายฯ ลำดับ 4</option>
+          <option value="080-504-6486">6. นางสาวพรนิตา ทองทุ้ย (พี่มุก) - รรท.หน.ฝ่ายฯ ลำดับ 5</option>
+          <option value="094-638-6144">7. นายทศวรรษ สิทธิ (พี่ตูน)</option>
+          <option value="091-890-7436">8. นายยุทธศาสตร์ ราชโส (พี่สหรัฐ)</option>
+          <option value="090-890-4136">9. นายกัญจน์พิสิษฐ์ อัศวแสงรัตน์ (พี่กัน)</option>
+          <option value="098-162-9494">10. ว่าที่ ร.ต.เอกสิษฐ์ หิรัณจารุยานนท์ (พี่ปอน)</option>
+          <option value="081-642-8860">11. นายสัญชัย นิระมล (พี่น๊อต)</option>
+          <option value="085-732-9779">12. นายมณฑล ทองทวี (พี่เจมส์)</option>
+          <option value="081-658-5357">13. นางสาวนภาวรรณ วศินรังสี (พี่น้ำ)</option>
+          <option value="094-934-3868">14. นายสิริพาณิชพงศ์ มหาโชติ (พี่คิง)</option>
+          <option value="080-000-0000">15. นายสิริพาณิชพงศ์ สุขกระจ่าง (พี่เอ็ม) - ผู้ดูแลระบบ</option>
+        </select>
+      </div>
+
+      <!-- Or Input Phone Manually -->
+      <form onsubmit="handleManualPhoneLoginSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">หรือ กรอกเบอร์โทรศัพท์ที่ลงทะเบียนไว้:</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-stone-400"><i class="fa-solid fa-phone"></i></span>
+            <input type="tel" id="login-phone-input" placeholder="08x-xxx-xxxx" required class="w-full pl-9 pr-3 py-2.5 bg-[#faf7f2] border border-[#dcd3c3] rounded-xl text-stone-900 font-semibold focus:bg-white focus:border-amber-500 focus:outline-none">
+          </div>
+          <p class="text-[10px] text-stone-400 mt-1">ระบบจะจดจำการเข้าสู่ระบบไว้ในเบราว์เซอร์ของเครื่องนี้โดยอัตโนมัติ</p>
+        </div>
+
+        <button type="submit" id="btn-submit-phone-login" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>เข้าสู่ระบบ</span>
+        </button>
+
+        <div class="text-center pt-2">
+          <button type="button" onclick="goToRegisterFromLogin()" class="text-amber-700 hover:underline font-semibold text-xs">
+            ยังไม่เคยลงทะเบียน? ลงทะเบียนผู้ใช้ใหม่ที่นี่
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: พิมพ์ใบขอใช้รถราชการ (แบบ ๓) ย้อนหลัง (เหมือนต้นฉบับ 100%) -->
+  <div id="modal-voucher-preview" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl space-y-4 border border-[#e8decb] my-auto">
+      <div class="flex items-center justify-between border-b border-[#f0e8dc] pb-2 print:hidden">
+        <div class="flex items-center space-x-2">
+          <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-print"></i>
+          </span>
+          <h3 class="text-sm font-bold text-stone-900 font-heading">ตัวอย่างพิมพ์ใบขออนุญาตใช้รถส่วนกลาง (แบบ ๓)</h3>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="printVoucherContent()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+            <i class="fa-solid fa-print"></i>
+            <span>สั่งพิมพ์ (Print)</span>
+          </button>
+          <button onclick="closeModal('modal-voucher-preview')" class="text-stone-400 hover:text-stone-600 p-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Voucher Content: Form 3 Official Reproduction -->
+      <div id="printable-voucher" class="bg-white text-black p-4 sm:p-6 border border-stone-300 rounded-lg text-[13.5pt] leading-relaxed font-serif" style="font-family: 'TH SarabunPSK', 'Sarabun', sans-serif;">
+        <div class="text-right text-xs font-bold">แบบ ๓</div>
+        <div class="text-center font-bold text-lg my-1">ใบขออนุญาตใช้รถส่วนกลาง</div>
+        <div class="text-right text-sm my-1">วันที่ <span id="vouch-day" class="font-bold border-b border-dotted border-black px-2"></span> เดือน <span id="vouch-month" class="font-bold border-b border-dotted border-black px-2"></span> พ.ศ. <span id="vouch-year" class="font-bold border-b border-dotted border-black px-2"></span></div>
+        <div class="font-bold text-sm my-1">เรียน  ผู้อำนวยการเขตคลองเตย</div>
+        
+        <div class="text-sm my-1 pl-8">
+          ข้าพเจ้า <span id="vouch-name" class="font-bold border-b border-dotted border-black px-2"></span> ตำแหน่ง <span id="vouch-pos" class="font-bold border-b border-dotted border-black px-2"></span>
+        </div>
+        <div class="text-sm my-1">
+          ขออนุญาตใช้รถ (ไปที่ไหน) <span id="vouch-dest" class="font-bold border-b border-dotted border-black px-2"></span>
+        </div>
+        <div class="text-sm my-1">
+          เพื่อ <span id="vouch-purpose" class="font-bold border-b border-dotted border-black px-2"></span> มีคนนั่ง <span id="vouch-passengers" class="font-bold border-b border-dotted border-black px-2"></span> คน
+        </div>
+        <div class="text-sm my-1">
+          ในวันที่ <span id="vouch-start-date" class="font-bold border-b border-dotted border-black px-2"></span> เวลา <span id="vouch-start-time" class="font-bold border-b border-dotted border-black px-2"></span> น. ถึงวันที่ <span id="vouch-end-date" class="font-bold border-b border-dotted border-black px-2"></span> เวลา <span id="vouch-end-time" class="font-bold border-b border-dotted border-black px-2"></span> น.
+        </div>
+
+        <!-- Signatures Section -->
+        <div class="w-72 ml-auto text-center text-xs mt-3 space-y-0.5">
+          <p>(ลงชื่อ) .................................................... ผู้ขออนุญาต</p>
+          <p>( <span id="vouch-sig-name"></span> )</p>
+          <p><span id="vouch-sig-pos"></span></p>
+          <p>ฝ่ายพัฒนาชุมชนและสวัสดิการสังคม สำนักงานเขตคลองเตย</p>
+        </div>
+
+        <div class="text-xs mt-2">
+          <strong>ความเห็นของหัวหน้าฝ่าย:</strong> เห็นควรอนุญาตการใช้รถราชการตามที่เสนอ
+        </div>
+        <div class="w-72 ml-auto text-center text-xs mt-1 space-y-0.5">
+          <p>(ลงชื่อ) ....................................................</p>
+          <p>( <span id="vouch-head-name">นางสาวภริตพร หมื่นสม</span> )</p>
+          <p><span id="vouch-head-pos">หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม</span></p>
+        </div>
+
+        <hr class="border-t border-black my-2">
+        <div class="font-bold text-xs">
+          คำสั่ง:  อนุญาต และให้พนักงานขับรถยนต์จัดทำบันทึกการใช้รถ (แบบ ๔) ให้เรียบร้อย
+        </div>
+
+        <div class="w-72 ml-auto text-center text-xs mt-1 space-y-0.5" id="vouch-approver-box">
+          <p>(ลงชื่อ) .................................................... ผู้อนุมัติ</p>
+          <p>( <span id="vouch-approver-name">นางสาวภริตพร หมื่นสม</span> )</p>
+          <p><span id="vouch-approver-pos">หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม</span></p>
+        </div>
+
+        <!-- Driver Log Table 4 Rows Standard -->
+        <table class="w-full border-collapse border border-black text-[10px] mt-2 leading-tight">
+          <tr>
+            <td colspan="2" class="border border-black p-1">ข้าพเจ้า ........................................................................ ตำแหน่ง ........................................................................</td>
+          </tr>
+          <tr>
+            <td class="border border-black p-1 w-1/2">นำรถยนต์ออกปฏิบัติงาน เวลา ...................... น.</td>
+            <td class="border border-black p-1 w-1/2">เลขไมล์ก่อนออก ....................................................</td>
+          </tr>
+          <tr>
+            <td class="border border-black p-1">นำรถกลับถึงสำนักงานเขต เวลา ...................... น.</td>
+            <td class="border border-black p-1">เลขไมล์รถกลับ .....................................................</td>
+          </tr>
+          <tr>
+            <td class="border border-black p-1">หมายเลขทะเบียนรถ <span id="vouch-car-plate" class="font-bold"></span></td>
+            <td class="border border-black p-1">ส่งคืนกุญแจรถยนต์เรียบร้อย (ลงชื่อ พขร.) <span id="vouch-driver-name" class="font-bold"></span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div id="modal-signatory-override" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 border border-[#e8decb] max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-[#f0e8dc] pb-3">
@@ -1480,10 +1762,18 @@
 
       <!-- Section 2: ผู้มีอำนาจอนุมัติระดับเขต (นอกเวลาราชการ / วันหยุด) -->
       <div class="space-y-2 pt-2 border-t border-[#f0e8dc]">
-        <div class="flex items-center space-x-1.5 text-xs font-bold text-amber-900">
-          <i class="fa-solid fa-landmark text-amber-600"></i>
-          <span>2. ผู้มีอำนาจอนุมัติระดับเขต (นอกเวลาราชการ / วันหยุด) — ผอ.เขต และผู้ช่วย ผอ.เขต</span>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-1.5 text-xs font-bold text-amber-900">
+            <i class="fa-solid fa-landmark text-amber-600"></i>
+            <span>2. ผู้มีอำนาจอนุมัติระดับเขต (นอกเวลาราชการ / วันหยุด) — ผอ.เขต และผู้ช่วย ผอ.เขต</span>
+          </div>
         </div>
+        <!-- In-Time Locked Notice -->
+        <div id="sec-approver-locked-msg" class="p-2.5 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-[11px] leading-relaxed hidden">
+          <i class="fa-solid fa-circle-check text-emerald-600 mr-1 font-bold"></i>
+          <strong>เดินทางในเวลาราชการปกติ (08.00 - 16.00 น.):</strong> อนุมัติจบในฝ่าย 100% โดยหัวหน้าฝ่ายพัฒนาชุมชนฯ (หรือผู้รักษาการที่ท่านเลือกในข้อ 1) จะทำหน้าที่ลงนามทั้งเสนอขอและอนุมัติสั่งใช้รถโดยอัตโนมัติ (Single-Signatory) จึงไม่อนุญาตให้เลือกผู้บริหารระดับเขต
+        </div>
+        <div id="sec-approver-options" class="space-y-1.5 text-xs">
         <div class="space-y-1.5 text-xs">
           <!-- ผอ.เขต ตัวจริง -->
           <div onclick="selectSignatoryOption('approver', 'นายบำรุง สำเนียงงาม', 'ผู้อำนวยการเขตคลองเตย', 'ผู้อำนวยการเขตคลองเตย (ค่าเริ่มต้นนอกเวลา)', 'ผอ.เขต ตัวจริง')" class="p-2.5 rounded-xl border border-[#e5dcce] hover:border-amber-500 hover:bg-amber-50/50 cursor-pointer transition flex items-center justify-between">
@@ -1511,6 +1801,7 @@
             </div>
             <span class="px-2 py-0.5 text-[9px] bg-amber-100 text-amber-800 rounded font-semibold">รรท. ผอ. ลำดับ 2</span>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -1591,6 +1882,7 @@
   ];
 
   // State Variables
+  // State Variables
   let currentUser = null;
   let currentMember = null;
   let departmentMembers = [];
@@ -1599,6 +1891,13 @@
   let dashboardData = null;
   let pendingAssignments = {}; // reqId -> { carPlate, driverName, type }
   const LIFF_ID = '2011779092-i5rhj1mo';
+
+  // 📋 My Requests Filter States
+  let rawMyRequestsList = [];
+  let currentReqStatusFilter = 'all';
+  let currentReqPeriodFilter = 'all';
+  let customFilterStartDate = '';
+  let customFilterEndDate = '';
 
     let adminProxyMode = 'self';
 
@@ -1705,10 +2004,51 @@
     await initLiffAndAuth(uid);
   });
 
+
+  function updateCharCount(inputId, counterId, maxLen) {
+    const input = document.getElementById(inputId);
+    const counter = document.getElementById(counterId);
+    if (!input || !counter) return;
+    const len = input.value.length;
+    counter.innerText = len + '/' + maxLen + ' ตัวอักษร';
+    if (len >= maxLen) {
+      counter.className = 'font-mono text-rose-600 font-bold';
+    } else {
+      counter.className = 'font-mono text-stone-400';
+    }
+  }
+
   // ══════════════════════════════════════════════════════════════
-  // LINE LIFF & AUTHENTICATION
+  // LINE LIFF, PHONE LOGIN & AUTHENTICATION (Remember Me)
   // ══════════════════════════════════════════════════════════════
   async function initLiffAndAuth(forcedUid) {
+    // 1. ตรวจสอบ Session ที่จดจำไว้ในเบราว์เซอร์ก่อนเสมอ (LocalStorage Remember Me)
+    const savedSessionStr = localStorage.getItem('ktd_car_user_session');
+    if (savedSessionStr) {
+      try {
+        const savedMember = JSON.parse(savedSessionStr);
+        if (savedMember && savedMember.name) {
+          currentUser = savedMember;
+          currentMember = savedMember;
+          const uidToSet = savedMember.userId || ('DESK-' + (savedMember.phone || '').replace(/\D/g, ''));
+          setUserIdToInputs(uidToSet);
+          applyRoleRestrictions(savedMember.roleKey);
+          showUserDisplay(savedMember.name, savedMember.role || 'สมาชิก');
+          setupRequesterDisplay(savedMember);
+          prefillUserForms(savedMember);
+          updateDepartmentTabVisibility(savedMember);
+          const btnLogout = document.getElementById('btn-logout-user');
+          if (btnLogout) btnLogout.classList.remove('hidden');
+
+          // ซิงค์ข้อมูลล่าสุดกับฐานข้อมูล Google Sheet ในเบื้องหลัง
+          checkUserRegistration(savedMember.userId, savedMember.phone);
+          return;
+        }
+      } catch (e) {
+        console.warn('Session parse error:', e);
+      }
+    }
+
     let lineUserId = forcedUid || localStorage.getItem('user_line_id') || '';
 
     try {
@@ -1729,10 +2069,14 @@
     if (lineUserId) {
       localStorage.setItem('user_line_id', lineUserId);
       setUserIdToInputs(lineUserId);
-      checkUserRegistration(lineUserId);
+      checkUserRegistration(lineUserId, '');
     } else {
-      showUserDisplay('ผู้เยี่ยมชมทั่วไป', 'ยังไม่ได้เข้าสู่ระบบ LINE');
+      showUserDisplay('ผู้ใช้งานทั่วไป', 'คลิกเพื่อเข้าสู่ระบบ');
       setupRequesterDisplay(null);
+      const target = getTargetPageFromUrl();
+      if (target !== 'admin_login') {
+        promptPhoneLogin();
+      }
     }
   }
 
@@ -1740,15 +2084,19 @@
     const ids = ['req-user-id', 'borrow-user-id', 'reg-user-id', 'mileage-user-id', 'fuel-user-id', 'repair-user-id', 'login-uid'];
     ids.forEach(id => {
       const el = document.getElementById(id);
-      if (el && !el.value) el.value = userId;
+      if (el) el.value = userId;
     });
   }
 
-  function checkUserRegistration(userId) {
-    callBackend('apiCheckMember', { userId: userId }, res => {
+  function checkUserRegistration(userId, phone) {
+    callBackend('apiCheckMember', { userId: userId, phone: phone }, res => {
       if (res && res.success && res.isRegistered && res.member) {
         currentUser = res.member;
         currentMember = res.member;
+        localStorage.setItem('ktd_car_user_session', JSON.stringify(res.member));
+        if (res.member.userId) localStorage.setItem('user_line_id', res.member.userId);
+        if (res.member.name) localStorage.setItem('user_full_name', res.member.name);
+
         if (res.departmentMembers && Array.isArray(res.departmentMembers)) {
           window.departmentMembers = res.departmentMembers;
         }
@@ -1756,6 +2104,9 @@
         showUserDisplay(res.member.name, res.member.role || 'สมาชิก');
         setupRequesterDisplay(res.member);
         prefillUserForms(res.member);
+        updateDepartmentTabVisibility(res.member);
+        const btnLogout = document.getElementById('btn-logout-user');
+        if (btnLogout) btnLogout.classList.remove('hidden');
       } else {
         if (res && res.departmentMembers && Array.isArray(res.departmentMembers)) {
           window.departmentMembers = res.departmentMembers;
@@ -1768,6 +2119,126 @@
         }
       }
     });
+  }
+
+  function updateDepartmentTabVisibility(member) {
+    const tabBorrow = document.getElementById('tab-borrow');
+    const tabRequest = document.getElementById('tab-request');
+    if (!member) return;
+
+    const dept = member.department || '';
+    if (dept === 'ฝ่ายพัฒนาชุมชนและสวัสดิการสังคม') {
+      // สมาชิกฝ่ายพัฒนาชุมชนฯ ซ่อนแท็บยืมรถข้ามฝ่าย 100%
+      if (tabBorrow) tabBorrow.classList.add('hidden');
+      if (tabRequest) tabRequest.classList.remove('hidden');
+      if (currentTab === 'borrow') switchTab('request');
+    } else if (dept) {
+      // สมาชิก 9 ฝ่ายอื่น แสดงแท็บยืมรถ และซ่อนแท็บขอใช้รถในฝ่าย
+      if (tabBorrow) tabBorrow.classList.remove('hidden');
+      if (tabRequest) tabRequest.classList.add('hidden');
+      if (currentTab === 'request') switchTab('borrow');
+    }
+  }
+
+  function promptPhoneLogin() {
+    openModal('modal-phone-login');
+  }
+
+  function handleUserPillClick() {
+    if (currentUser) {
+      if (confirm('เข้าสู่ระบบในชื่อ: ' + currentUser.name + '\nฝ่าย: ' + currentUser.department + '\n\nต้องการ "ออกจากระบบ" หรือไม่?')) {
+        logoutUser();
+      }
+    } else {
+      promptPhoneLogin();
+    }
+  }
+
+  function handleQuickRosterSelect(phone) {
+    if (!phone) return;
+    const input = document.getElementById('login-phone-input');
+    if (input) input.value = phone;
+    submitPhoneLoginWithPhone(phone);
+  }
+
+  function handleManualPhoneLoginSubmit(e) {
+    e.preventDefault();
+    const phoneInput = document.getElementById('login-phone-input');
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    if (!phone) {
+      showToast('กรุณากรอกเบอร์โทรศัพท์', 'warning');
+      return;
+    }
+    submitPhoneLoginWithPhone(phone);
+  }
+
+  function submitPhoneLoginWithPhone(phone) {
+    const btn = document.getElementById('btn-submit-phone-login');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังตรวจสอบ...';
+    }
+
+    callBackend('apiCheckMember', { phone: phone }, res => {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-1"></i> เข้าสู่ระบบ';
+      }
+
+      if (res && res.success && res.isRegistered && res.member) {
+        currentUser = res.member;
+        currentMember = res.member;
+        localStorage.setItem('ktd_car_user_session', JSON.stringify(res.member));
+        if (res.member.userId) localStorage.setItem('user_line_id', res.member.userId);
+        if (res.member.name) localStorage.setItem('user_full_name', res.member.name);
+
+        closeModal('modal-phone-login');
+        setUserIdToInputs(res.member.userId || ('DESK-' + phone.replace(/\D/g, '')));
+        applyRoleRestrictions(res.member.roleKey);
+        showUserDisplay(res.member.name, res.member.role || 'สมาชิก');
+        setupRequesterDisplay(res.member);
+        prefillUserForms(res.member);
+        updateDepartmentTabVisibility(res.member);
+        const btnLogout = document.getElementById('btn-logout-user');
+        if (btnLogout) btnLogout.classList.remove('hidden');
+
+        showToast('เข้าสู่ระบบสำเร็จ ยินดีต้อนรับ ' + res.member.name, 'success');
+
+        if (res.member.department === 'ฝ่ายพัฒนาชุมชนและสวัสดิการสังคม') {
+          switchTab('request');
+        } else {
+          switchTab('borrow');
+        }
+      } else {
+        closeModal('modal-phone-login');
+        showToast('ไม่พบข้อมูลเบอร์นี้ในระบบ นำท่านไปยังหน้าลงทะเบียนใหม่...', 'info');
+        switchTab('register');
+        const regPhone = document.getElementById('reg-phone');
+        if (regPhone) regPhone.value = phone;
+        const regUid = document.getElementById('reg-user-id');
+        if (regUid) regUid.value = 'DESK-' + phone.replace(/\D/g, '');
+      }
+    });
+  }
+
+  function goToRegisterFromLogin() {
+    closeModal('modal-phone-login');
+    switchTab('register');
+  }
+
+  function logoutUser() {
+    if (!confirm('ยืนยันออกจากระบบใช่หรือไม่?')) return;
+    localStorage.removeItem('ktd_car_user_session');
+    localStorage.removeItem('user_line_id');
+    localStorage.removeItem('user_full_name');
+    currentUser = null;
+    currentMember = null;
+    showUserDisplay('ผู้ใช้งานทั่วไป', 'คลิกเพื่อเข้าสู่ระบบ');
+    setupRequesterDisplay(null);
+    const btnLogout = document.getElementById('btn-logout-user');
+    if (btnLogout) btnLogout.classList.add('hidden');
+    showToast('ออกจากระบบเรียบร้อยแล้ว', 'info');
+    promptPhoneLogin();
   }
 
   function prefillUserForms(member) {
@@ -2064,19 +2535,44 @@
     } else {
       sigData = {
         isOutside: false,
-        badgeText: '🌿 ในเวลาราชการ (08.00 - 16.00 น.) • อนุมัติในฝ่าย',
+        badgeText: '🌿 ในเวลาราชการ (08.00 - 16.00 น.) • อนุมัติจบในฝ่าย (Single-Signatory)',
         badgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
         headName: 'นางสาวภริตพร หมื่นสม',
         headPos: 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม',
-        headBadge: 'ตัวจริง',
+        headBadge: 'ผู้ลงนาม (เสนอขอ & อนุมัติ)',
         approverName: 'นางสาวภริตพร หมื่นสม',
         approverPos: 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม',
-        approverBadge: 'อนุมัติในฝ่าย (08.00 - 16.00 น.)',
-        noteText: '* เดินทางในวันและเวลาราชการปกติ (08.00 - 16.00 น.) หัวหน้าฝ่ายฯ มีอำนาจอนุมัติจบในฝ่าย'
+        approverBadge: 'อนุมัติจบในฝ่าย',
+        noteText: '* เดินทางในวันและเวลาราชการปกติ (08.00 - 16.00 น.) หัวหน้าฝ่ายฯ มีอำนาจอนุมัติจบในฝ่าย (ลงนามทั้ง 2 ตำแหน่ง)'
       };
     }
 
     renderSignatoryDisplay(sigData, false);
+  }
+
+  function isTripOutsideOfficialHours() {
+    const isMultiDay = document.getElementById('req-is-multiday') && document.getElementById('req-is-multiday').checked;
+    const dateInput = document.getElementById('req-date') ? document.getElementById('req-date').value : '';
+    const timeStart = document.getElementById('req-time-start') ? document.getElementById('req-time-start').value : '08:00';
+    const timeEnd = document.getElementById('req-time-end') ? document.getElementById('req-time-end').value : '16:00';
+
+    let isWeekend = false;
+    if (dateInput) {
+      const d = new Date(dateInput);
+      const day = d.getDay();
+      if (day === 0 || day === 6) isWeekend = true;
+    }
+
+    const normalize = t => {
+      if (!t) return '08:00';
+      t = t.replace('.', ':').trim();
+      const p = t.split(':');
+      return String(p[0] || '8').padStart(2, '0') + ':' + String(p[1] || '00').padStart(2, '0');
+    };
+    const tStart = normalize(timeStart);
+    const tEnd = normalize(timeEnd);
+
+    return isMultiDay || isWeekend || (tStart < '08:00') || (tEnd > '16:00');
   }
 
   function renderSignatoryDisplay(data, isOverridden) {
@@ -2151,15 +2647,32 @@
   }
 
   function openSignatoryOverrideModal() {
+    const isOutside = isTripOutsideOfficialHours();
+    const secApprover = document.getElementById('sec-approver-options');
+    const secLockedMsg = document.getElementById('sec-approver-locked-msg');
+    if (isOutside) {
+      if (secApprover) secApprover.classList.remove('hidden');
+      if (secLockedMsg) secLockedMsg.classList.add('hidden');
+    } else {
+      if (secApprover) secApprover.classList.add('hidden');
+      if (secLockedMsg) secLockedMsg.classList.remove('hidden');
+    }
     openModal('modal-signatory-override');
   }
 
   function selectSignatoryOption(type, name, position, note, badge) {
+    const isOutside = isTripOutsideOfficialHours();
+
+    // Guardrail: ในเวลาราชการ ห้ามเลือกผู้บริหารระดับเขตเด็ดขาด
+    if (!isOutside && type === 'approver') {
+      showToast('ในเวลาราชการปกติ หัวหน้าฝ่ายฯ มีอำนาจอนุมัติจบในฝ่าย ไม่อนุญาตให้เลือกผู้บริหารระดับเขต', 'warning');
+      return;
+    }
+
     isSignatoryManuallyOverridden = true;
     
-    // ดึงค่าปัจจุบัน
     let currentData = manualSignatoryData || {
-      isOutside: false,
+      isOutside: isOutside,
       badgeText: 'กำหนดผู้ลงนามแทนพิเศษ',
       badgeClass: 'bg-purple-100 text-purple-900 border border-purple-300',
       headName: document.getElementById('sig-head-name') ? document.getElementById('sig-head-name').innerText : 'นางสาวภริตพร หมื่นสม',
@@ -2171,20 +2684,25 @@
       noteText: note
     };
 
+    currentData.isOutside = isOutside;
+
     if (type === 'head') {
       currentData.headName = name;
       currentData.headPos = position;
       currentData.headBadge = badge || 'รักษาการ';
-      // ถ้าเป็นการเดินทางในเวลา ผู้อนุมัติคือผู้ที่ทำหน้าที่หัวหน้าฝ่ายด้วย
-      if (!currentData.isOutside) {
+
+      // 🔒 Single-Signatory Rule: ถ้าเป็นการเดินทางในเวลาราชการ ให้บุคคลนี้เป็นทั้งผู้เสนอขอ และผู้อนุมัติทั้ง 2 ตำแหน่ง
+      if (!isOutside) {
         currentData.approverName = name;
         currentData.approverPos = position;
         currentData.approverBadge = 'อนุมัติในฝ่าย (รรท.)';
       }
     } else if (type === 'approver') {
-      currentData.approverName = name;
-      currentData.approverPos = position;
-      currentData.approverBadge = badge || 'ผู้อนุมัติ';
+      if (isOutside) {
+        currentData.approverName = name;
+        currentData.approverPos = position;
+        currentData.approverBadge = badge || 'ผู้อนุมัติ';
+      }
     }
 
     currentData.noteText = note;
