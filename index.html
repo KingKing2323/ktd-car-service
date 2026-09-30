@@ -1579,6 +1579,8 @@
   </div>
 
   <!-- MODAL: พิมพ์ใบขอใช้รถราชการ (แบบ ๓) ย้อนหลัง (เหมือนต้นฉบับ 100%) -->
+    <!-- Modal แสดงตัวอย่างและสั่งพิมพ์ใบขอใช้รถ (แบบ ๓) ราชการ 1 หน้าพอดี 100% -->
+    <!-- Modal แสดงตัวอย่างและสั่งพิมพ์ใบขอใช้รถ (แบบ ๓) ราชการ 1 หน้าพอดี 100% -->
   <div id="modal-voucher-preview" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl space-y-4 border border-[#e8decb] my-auto">
       <div class="flex items-center justify-between border-b border-[#f0e8dc] pb-2 print:hidden">
@@ -1591,7 +1593,7 @@
         <div class="flex items-center space-x-2">
           <button onclick="printVoucherContent()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
             <i class="fa-solid fa-print"></i>
-            <span>สั่งพิมพ์ (Print)</span>
+            <span>สั่งพิมพ์ / บันทึก PDF</span>
           </button>
           <button onclick="closeModal('modal-voucher-preview')" class="text-stone-400 hover:text-stone-600 p-1">
             <i class="fa-solid fa-xmark"></i>
@@ -1599,75 +1601,119 @@
         </div>
       </div>
 
-      <!-- Printable Voucher Content: Form 3 Official Reproduction -->
-      <div id="printable-voucher" class="bg-white text-black p-4 sm:p-6 border border-stone-300 rounded-lg text-[13.5pt] leading-relaxed font-serif" style="font-family: 'TH SarabunPSK', 'Sarabun', sans-serif;">
-        <div class="text-right text-xs font-bold">แบบ ๓</div>
+      <!-- Printable Voucher Content: ถอดแบบตรงตาม ใบขอใช้รถ_แบบ3_แม่แบบวันทำการ_หนฝ่ายอนุมัติ.docx 100% -->
+      <div id="printable-voucher" class="bg-white text-black p-4 sm:p-6 border border-stone-300 rounded-lg text-[13pt] leading-snug font-serif" style="font-family: 'TH SarabunPSK', 'Sarabun', sans-serif;">
+        <div class="text-right text-xs font-semibold">แบบ ๓</div>
         <div class="text-center font-bold text-lg my-1">ใบขออนุญาตใช้รถส่วนกลาง</div>
-        <div class="text-right text-sm my-1">วันที่ <span id="vouch-day" class="font-bold border-b border-dotted border-black px-2"></span> เดือน <span id="vouch-month" class="font-bold border-b border-dotted border-black px-2"></span> พ.ศ. <span id="vouch-year" class="font-bold border-b border-dotted border-black px-2"></span></div>
-        <div class="font-bold text-sm my-1">เรียน  ผู้อำนวยการเขตคลองเตย</div>
+        <div class="text-right text-xs my-1">วันที่ <span id="vouch-day" class="font-bold border-b border-dotted border-black px-2"></span> เดือน <span id="vouch-month" class="font-bold border-b border-dotted border-black px-2"></span> พ.ศ. <span id="vouch-year" class="font-bold border-b border-dotted border-black px-2"></span></div>
+        <div class="font-bold text-xs my-1">เรียน  ผู้อำนวยการเขตคลองเตย</div>
         
-        <div class="text-sm my-1 pl-8">
+        <div class="text-xs my-1 pl-8">
           ข้าพเจ้า <span id="vouch-name" class="font-bold border-b border-dotted border-black px-2"></span> ตำแหน่ง <span id="vouch-pos" class="font-bold border-b border-dotted border-black px-2"></span>
         </div>
-        <div class="text-sm my-1">
+        <div class="text-xs my-1">
           ขออนุญาตใช้รถ (ไปที่ไหน) <span id="vouch-dest" class="font-bold border-b border-dotted border-black px-2"></span>
         </div>
-        <div class="text-sm my-1">
+        <div class="text-xs my-1">
           เพื่อ <span id="vouch-purpose" class="font-bold border-b border-dotted border-black px-2"></span> มีคนนั่ง <span id="vouch-passengers" class="font-bold border-b border-dotted border-black px-2"></span> คน
         </div>
-        <div class="text-sm my-1">
-          ในวันที่ <span id="vouch-start-date" class="font-bold border-b border-dotted border-black px-2"></span> เวลา <span id="vouch-start-time" class="font-bold border-b border-dotted border-black px-2"></span> น. ถึงวันที่ <span id="vouch-end-date" class="font-bold border-b border-dotted border-black px-2"></span> เวลา <span id="vouch-end-time" class="font-bold border-b border-dotted border-black px-2"></span> น.
+        <div class="text-xs my-1">
+          ในวันที่ <span id="vouch-start-date" class="font-bold border-b border-dotted border-black px-2"></span> เวลา <span id="vouch-start-time" class="font-bold border-b border-dotted border-black px-2"></span> น.
+        </div>
+        <div class="text-xs my-1">
+          ถึงวันที่ <span id="vouch-end-date" class="font-bold border-b border-dotted border-black px-2"></span> เวลา <span id="vouch-end-time" class="font-bold border-b border-dotted border-black px-2"></span> น.
         </div>
 
-        <!-- Signatures Section -->
-        <div class="w-72 ml-auto text-center text-xs mt-3 space-y-0.5">
-          <p>(ลงชื่อ) .................................................... ผู้ขออนุญาต</p>
-          <p>( <span id="vouch-sig-name"></span> )</p>
-          <p><span id="vouch-sig-pos"></span></p>
-          <p>ฝ่ายพัฒนาชุมชนและสวัสดิการสังคม สำนักงานเขตคลองเตย</p>
+        <!-- ผู้ขออนุญาต (ไม่มีตำแหน่งและฝ่ายใต้ชื่อ ตามแม่แบบทางการ) -->
+        <div class="w-64 ml-auto text-center text-xs mt-3 space-y-0.5">
+          <p>(ลงชื่อ) ............................................ ผู้ขออนุญาต</p>
+          <p>( <span id="vouch-req-name" class="font-semibold"></span> )</p>
         </div>
 
-        <div class="text-xs mt-2">
-          <strong>ความเห็นของหัวหน้าฝ่าย:</strong> เห็นควรอนุญาตการใช้รถราชการตามที่เสนอ
-        </div>
-        <div class="w-72 ml-auto text-center text-xs mt-1 space-y-0.5">
-          <p>(ลงชื่อ) ....................................................</p>
-          <p>( <span id="vouch-head-name">นางสาวภริตพร หมื่นสม</span> )</p>
-          <p><span id="vouch-head-pos">หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม</span></p>
-        </div>
-
-        <hr class="border-t border-black my-2">
-        <div class="font-bold text-xs">
-          คำสั่ง:  อนุญาต และให้พนักงานขับรถยนต์จัดทำบันทึกการใช้รถ (แบบ ๔) ให้เรียบร้อย
+        <!-- หัวหน้าฝ่าย (ไม่มีคำว่า ความเห็นของหัวหน้าฝ่าย: เห็นควรอนุญาต...) -->
+        <div class="w-64 ml-auto text-center text-xs mt-2 space-y-0.5">
+          <p>(ลงชื่อ) ............................................ หัวหน้าฝ่าย</p>
+          <p>( <span id="vouch-head-name" class="font-semibold">นางสาวภริตพร  หมื่นสม</span> )</p>
+          <p class="text-[11px]">นักพัฒนาสังคมชำนาญการพิเศษ</p>
+          <p class="text-[10px]">หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม สำนักงานเขตคลองเตย</p>
+          <p>วันที่ ...................................................</p>
         </div>
 
-        <div class="w-72 ml-auto text-center text-xs mt-1 space-y-0.5" id="vouch-approver-box">
-          <p>(ลงชื่อ) .................................................... ผู้อนุมัติ</p>
-          <p>( <span id="vouch-approver-name">นางสาวภริตพร หมื่นสม</span> )</p>
-          <p><span id="vouch-approver-pos">หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม</span></p>
+        <!-- คำสั่งอนุญาต -->
+        <div class="text-xs mt-2 pl-4 text-left">
+          อนุญาต และให้พนักงานขับรถยนต์จัดทำบันทึกการใช้รถ (แบบ 4) ให้เรียบร้อย
         </div>
 
-        <!-- Driver Log Table 4 Rows Standard -->
-        <table class="w-full border-collapse border border-black text-[10px] mt-2 leading-tight">
-          <tr>
-            <td colspan="2" class="border border-black p-1">ข้าพเจ้า ........................................................................ ตำแหน่ง ........................................................................</td>
-          </tr>
-          <tr>
-            <td class="border border-black p-1 w-1/2">นำรถยนต์ออกปฏิบัติงาน เวลา ...................... น.</td>
-            <td class="border border-black p-1 w-1/2">เลขไมล์ก่อนออก ....................................................</td>
-          </tr>
-          <tr>
-            <td class="border border-black p-1">นำรถกลับถึงสำนักงานเขต เวลา ...................... น.</td>
-            <td class="border border-black p-1">เลขไมล์รถกลับ .....................................................</td>
-          </tr>
-          <tr>
-            <td class="border border-black p-1">หมายเลขทะเบียนรถ <span id="vouch-car-plate" class="font-bold"></span></td>
-            <td class="border border-black p-1">ส่งคืนกุญแจรถยนต์เรียบร้อย (ลงชื่อ พขร.) <span id="vouch-driver-name" class="font-bold"></span></td>
-          </tr>
-        </table>
+        <!-- ผู้มีอำนาจสั่งใช้รถ -->
+        <div class="w-64 ml-auto text-center text-xs mt-1 space-y-0.5">
+          <p>(ลงชื่อ).........................................................ผู้มีอำนาจสั่งใช้รถ</p>
+          <p>( <span id="vouch-approver-name" class="font-semibold">นางสาวภริตพร  หมื่นสม</span> )</p>
+          <p id="vouch-approver-pos1" class="text-[11px]">นักพัฒนาสังคมชำนาญการพิเศษ</p>
+          <p id="vouch-approver-pos2" class="text-[10px]">หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม สำนักงานเขตคลองเตย</p>
+          <p>วันที่.........................................................</p>
+        </div>
+
+        <!-- กรอบบันทึก พขร. ด้านล่าง (ตารางสี่เหลี่ยมตามแม่แบบราชการ) -->
+        <div class="border border-black p-2 mt-2 text-[10.5pt] leading-tight space-y-1">
+          <div>ข้าพเจ้า ......................................................................... ตำแหน่ง ............................................................</div>
+          <div>นำรถยนต์ออกปฏิบัติงาน เมื่อเวลา .................................. น.   เลขไมล์ก่อนออก ...........................................</div>
+          <div>นำรถกลับมาถึงสำนักงานเขต เมื่อเวลา ............................ น.   เลขไมล์รถกลับมา .........................................</div>
+          <div>หมายเลขทะเบียนรถ ............................................... และได้ส่งคืนกุญแจรถยนต์เป็นที่เรียบร้อย</div>
+          <div class="text-right pr-6 mt-1">(ลงชื่อ)........................................พนักงานขับรถยนต์</div>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Modal ยืนยันการยกเลิกคำขอใช้รถ (ธีมตรงกับเว็บ 100%) -->
+  <div id="modal-cancel-confirm" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 border border-[#e8decb] my-auto animate-in fade-in zoom-in duration-200">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mx-auto shadow-inner">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-base font-bold text-stone-900 font-heading">ยืนยันการยกเลิกคำขอใช้รถราชการ</h3>
+        <p class="text-xs text-stone-500">ท่านต้องการยกเลิกคำขอใช้รถรายการนี้ใช่หรือไม่?</p>
+      </div>
+
+      <!-- Request Details Card -->
+      <div class="bg-amber-50/60 rounded-2xl p-3.5 border border-amber-200/70 text-xs space-y-2">
+        <div class="flex items-center justify-between border-b border-amber-200/50 pb-1.5">
+          <span class="text-stone-500 font-medium">รหัสคำขอ:</span>
+          <span id="cancel-card-id" class="font-mono font-bold text-stone-900 text-sm"></span>
+        </div>
+        <div class="flex items-start justify-between">
+          <span class="text-stone-500 font-medium">วันที่เดินทาง:</span>
+          <span id="cancel-card-date" class="font-semibold text-stone-900 text-right"></span>
+        </div>
+        <div class="flex items-start justify-between">
+          <span class="text-stone-500 font-medium">ปลายทาง:</span>
+          <span id="cancel-card-dest" class="font-semibold text-stone-900 text-right max-w-[210px] truncate"></span>
+        </div>
+        <div class="flex items-start justify-between">
+          <span class="text-stone-500 font-medium">ผู้ขอใช้รถ:</span>
+          <span id="cancel-card-requester" class="font-semibold text-stone-900 text-right"></span>
+        </div>
+      </div>
+
+      <!-- Optional Reason -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-stone-700">เหตุผลในการขอยกเลิก (ระบุหรือไม่ก็ได้):</label>
+        <textarea id="cancel-input-reason" rows="2" placeholder="เช่น ภารกิจเลื่อน, ประชุมออนไลน์แทน ฯลฯ" class="w-full text-xs p-3 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition resize-none"></textarea>
+      </div>
+
+      <!-- Modal Action Buttons -->
+      <div class="flex items-center space-x-3 pt-2">
+        <button type="button" onclick="closeModal('modal-cancel-confirm')" class="flex-1 py-2.5 px-4 rounded-xl border border-stone-300 text-stone-700 text-xs font-semibold hover:bg-stone-50 transition active:scale-[0.98]">
+          ไม่ยกเลิก (ปิด)
+        </button>
+        <button type="button" id="btn-confirm-cancel" onclick="executeCancelMyRequest()" class="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-md shadow-rose-600/20 transition active:scale-[0.98] flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-trash-can"></i>
+          <span>ยืนยันยกเลิกคำขอ</span>
+        </button>
+      </div>
+    </div>
+  </div>div>
 
   <div id="modal-signatory-override" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 border border-[#e8decb] max-h-[90vh] overflow-y-auto">
@@ -3291,6 +3337,16 @@
   // ══════════════════════════════════════════════════════════════
   // MY REQUESTS (ติดตามคำขอ & ดาวน์โหลด Word/PDF)
   // ══════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════
+  // MY REQUESTS & TRACKING CONTROLLER (v3.2 Full Redesign)
+  // ══════════════════════════════════════════════════════════════
+  window.myRequestsData = [];
+  window.currentRenderedRequests = [];
+  window.currentStatusFilter = 'all';
+  window.currentPeriodFilter = 'all';
+  window.currentCancelTarget = null;
+
   function loadMyRequests() {
     const container = document.getElementById('my-requests-list');
     if (!container) return;
@@ -3298,79 +3354,381 @@
 
     const uid = (currentUser && currentUser.userId) ? currentUser.userId : (localStorage.getItem('user_line_id') || '');
     const uName = (currentUser && currentUser.name) ? currentUser.name : (localStorage.getItem('user_full_name') || '');
+    const uPhone = (currentUser && currentUser.phone) ? currentUser.phone : (localStorage.getItem('user_phone') || '');
 
-    callBackend('apiGetMyRequests', { userId: uid, requesterName: uName }, res => {
-      if (res && res.success && Array.isArray(res.requests) && res.requests.length > 0) {
-        container.innerHTML = '';
-        res.requests.forEach(r => {
-          const card = document.createElement('div');
-          card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-[#e8decb] space-y-3';
-
-          let statusBadge = '<span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-100 text-amber-800 border border-amber-200">รอจัดคิว</span>';
-          if (r.status === 'assigned' || r.status === 'approved') {
-            statusBadge = '<span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">จัดคิวแล้ว</span>';
-          } else if (r.status === 'cancelled' || r.status === 'rejected') {
-            statusBadge = '<span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-rose-100 text-rose-800 border border-rose-200">ยกเลิก/ปฏิเสธ</span>';
-          }
-
-          // ตรวจสอบรูปภาพที่แนบ (อาจมีหลายรูป)
-          let photosHtml = '';
-          if (r.docImgUrl) {
-            const urls = r.docImgUrl.split(',').map(u => u.trim()).filter(Boolean);
-            if (urls.length === 1) {
-              photosHtml = '<a href="' + urls[0] + '" target="_blank" class="px-2.5 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-lg font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-image"></i> <span>รูปใบใช้รถ</span></a>';
-            } else if (urls.length > 1) {
-              photosHtml = urls.map((u, idx) => 
-                '<a href="' + u + '" target="_blank" class="px-2 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-lg font-semibold transition flex items-center space-x-1 text-[11px]"><i class="fa-solid fa-image"></i> <span>รูปที่ ' + (idx + 1) + '</span></a>'
-              ).join(' ');
-            }
-          }
-
-          const travelDateStr = r.travelDate || r.dateThai || r.date || '-';
-          const assignedCarStr = r.assignedCar || r.carPlate || '';
-          const assignedDriverStr = r.assignedDriver || r.driverName || '';
-
-          card.innerHTML = 
-            '<div class="flex items-center justify-between border-b border-[#f0e8dc] pb-2.5">' +
-              '<div class="flex items-center space-x-2">' +
-                '<span class="font-mono text-xs font-bold text-stone-900">' + r.reqId + '</span>' +
-                statusBadge +
-              '</div>' +
-              '<span class="text-[10px] text-stone-400">' + (r.timestamp || r.submittedAt || '') + '</span>' +
-            '</div>' +
-            '<div class="space-y-1 text-xs text-stone-700">' +
-              '<p>📍 <strong>ปลายทาง:</strong> ' + (r.destination || '-') + '</p>' +
-              '<p>🎯 <strong>วัตถุประสงค์:</strong> ' + (r.purpose || '-') + '</p>' +
-              '<p>📅 <strong>วันเวลา:</strong> ' + travelDateStr + ' (' + (r.timeStart || '') + ' - ' + (r.timeEnd || '') + ' น.)</p>' +
-              (assignedCarStr ? ('<p class="text-emerald-700 font-semibold">🚗 รถที่จัดให้: ' + assignedCarStr + ' (' + (assignedDriverStr || '-') + ')</p>') : '') +
-            '</div>' +
-            '<div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#f0e8dc] text-xs">' +
-              '<div class="flex flex-wrap items-center gap-1.5">' +
-                (r.docWordUrl ? ('<a href="' + r.docWordUrl + '" target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-file-word"></i> <span>Word</span></a>') : '') +
-                (r.docPdfUrl ? ('<a href="' + r.docPdfUrl + '" target="_blank" class="px-2.5 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-lg font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-file-pdf"></i> <span>PDF</span></a>') : '') +
-                photosHtml +
-              '</div>' +
-              (r.status === 'pending' ? ('<button onclick="cancelMyReq(\'' + r.reqId + '\')" class="text-rose-600 hover:text-rose-800 text-[11px] font-semibold"><i class="fa-solid fa-ban mr-1"></i> ยกเลิกคำขอนี้</button>') : '') +
-            '</div>';
-          container.appendChild(card);
-        });
+    callBackend('apiGetMyRequests', { userId: uid, requesterName: uName, phone: uPhone }, res => {
+      if (res && res.success && Array.isArray(res.requests)) {
+        window.myRequestsData = res.requests;
+        updatePillCountsAndFilter();
       } else {
-        container.innerHTML = '<div class="text-center py-12 text-stone-400 text-xs bg-white rounded-2xl border border-[#e8decb]"><i class="fa-solid fa-clipboard-question text-3xl mb-2 text-stone-300"></i><p>ยังไม่มีประวัติการขอใช้รถของคุณ</p></div>';
+        container.innerHTML = '<div class="text-center py-12 text-stone-400 text-xs"><i class="fa-solid fa-file-circle-question text-3xl mb-2 text-stone-300"></i><p>' + (res ? res.message : 'ไม่พบประวัติคำขอใช้รถ') + '</p></div>';
+        updateFilterCountsZero();
       }
     });
   }
 
-  function cancelMyReq(reqId) {
-    if (!confirm('ยืนยันยกเลิกคำขอใช้รถรหัส ' + reqId + ' หรือไม่?')) return;
-    const uid = (currentUser && currentUser.userId) ? currentUser.userId : (localStorage.getItem('user_line_id') || '');
-    callBackend('apiCancelMyRequest', { reqId: reqId, userId: uid }, res => {
-      if (res && res.success) {
-        showToast('ยกเลิกคำขอเรียบร้อยแล้ว', 'success');
-        loadMyRequests();
-      } else {
-        showToast(res ? res.message : 'ไม่สามารถยกเลิกได้', 'error');
+  function updateFilterCountsZero() {
+    ['all', 'pending', 'assigned', 'pooled', 'cancelled'].forEach(key => {
+      const el = document.getElementById('count-' + key);
+      if (el) el.textContent = '0';
+    });
+  }
+
+  function setStatusFilter(status) {
+    window.currentStatusFilter = status;
+    const statusBtns = {
+      'all': 'filter-status-all',
+      'pending': 'filter-status-pending',
+      'assigned': 'filter-status-assigned',
+      'pooled': 'filter-status-pooled',
+      'cancelled': 'filter-status-cancelled'
+    };
+    Object.keys(statusBtns).forEach(k => {
+      const btn = document.getElementById(statusBtns[k]);
+      if (btn) {
+        if (k === status) {
+          btn.className = 'filter-status-btn px-3 py-1.5 rounded-xl font-medium text-xs transition flex items-center space-x-1.5 bg-amber-600 text-white shadow-sm';
+        } else {
+          btn.className = 'filter-status-btn px-3 py-1.5 rounded-xl font-medium text-xs transition flex items-center space-x-1.5 bg-white text-stone-600 hover:bg-stone-50 border border-stone-200';
+        }
       }
     });
+    renderMyRequestsList();
+  }
+
+  function setPeriodFilter(period) {
+    window.currentPeriodFilter = period;
+    const periodBtns = {
+      'all': 'filter-period-all',
+      'week': 'filter-period-week',
+      'month': 'filter-period-month',
+      'custom': 'filter-period-custom'
+    };
+    Object.keys(periodBtns).forEach(k => {
+      const btn = document.getElementById(periodBtns[k]);
+      if (btn) {
+        if (k === period) {
+          btn.className = 'filter-period-btn px-3 py-1.5 rounded-xl font-medium text-xs transition bg-stone-800 text-white shadow-sm';
+        } else {
+          btn.className = 'filter-period-btn px-3 py-1.5 rounded-xl font-medium text-xs transition bg-white text-stone-600 hover:bg-stone-50 border border-stone-200';
+        }
+      }
+    });
+
+    const customBox = document.getElementById('period-custom-box');
+    if (customBox) {
+      if (period === 'custom') {
+        customBox.classList.remove('hidden');
+      } else {
+        customBox.classList.add('hidden');
+      }
+    }
+    renderMyRequestsList();
+  }
+
+  function applyCustomPeriodFilter() {
+    renderMyRequestsList();
+  }
+
+  function updatePillCountsAndFilter() {
+    const list = window.myRequestsData || [];
+    const counts = { all: list.length, pending: 0, assigned: 0, pooled: 0, cancelled: 0 };
+
+    list.forEach(r => {
+      const s = (r.status || 'pending').toLowerCase();
+      if (s === 'pending') {
+        counts.pending++;
+      } else if (s === 'assigned' || s === 'approved' || s === 'announced') {
+        counts.assigned++;
+      } else if (s === 'pooled' || s.includes('รวมคิว')) {
+        counts.pooled++;
+      } else if (s === 'cancelled' || s === 'rejected') {
+        counts.cancelled++;
+      }
+    });
+
+    ['all', 'pending', 'assigned', 'pooled', 'cancelled'].forEach(key => {
+      const el = document.getElementById('count-' + key);
+      if (el) el.textContent = String(counts[key]);
+    });
+
+    renderMyRequestsList();
+  }
+
+  function formatCardTimestamp(rawStr) {
+    if (!rawStr) return '-';
+    if (rawStr.includes('น.') || rawStr.includes('ก.ย.') || rawStr.includes('ตุลาคม') || rawStr.includes('มกราคม')) {
+      return rawStr;
+    }
+    const d = new Date(rawStr);
+    if (isNaN(d.getTime())) return rawStr;
+    const thaiDays = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
+    const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const dayName = thaiDays[d.getDay()];
+    const dateNum = d.getDate();
+    const monthName = thaiMonths[d.getMonth()];
+    const yearShort = String(d.getFullYear() + 543).slice(-2);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return 'วัน' + dayName + 'ที่ ' + dateNum + ' ' + monthName + ' ' + yearShort + ' ' + hh + ':' + mm + ' น.';
+  }
+
+  function renderMyRequestsList() {
+    const container = document.getElementById('my-requests-list');
+    if (!container) return;
+
+    let filtered = (window.myRequestsData || []).slice();
+
+    // 1. Filter by Status
+    if (window.currentStatusFilter !== 'all') {
+      filtered = filtered.filter(r => {
+        const s = (r.status || 'pending').toLowerCase();
+        if (window.currentStatusFilter === 'pending') return s === 'pending';
+        if (window.currentStatusFilter === 'assigned') return (s === 'assigned' || s === 'approved' || s === 'announced');
+        if (window.currentStatusFilter === 'pooled') return (s === 'pooled' || s.includes('รวมคิว'));
+        if (window.currentStatusFilter === 'cancelled') return (s === 'cancelled' || s === 'rejected');
+        return true;
+      });
+    }
+
+    // 2. Filter by Period
+    const now = new Date();
+    if (window.currentPeriodFilter === 'week') {
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      startOfWeek.setHours(0,0,0,0);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      endOfWeek.setHours(23,59,59,999);
+
+      filtered = filtered.filter(r => {
+        const rd = new Date(r.date);
+        return !isNaN(rd.getTime()) && rd >= startOfWeek && rd <= endOfWeek;
+      });
+    } else if (window.currentPeriodFilter === 'month') {
+      const curYear = now.getFullYear();
+      const curMonth = now.getMonth();
+      filtered = filtered.filter(r => {
+        const rd = new Date(r.date);
+        return !isNaN(rd.getTime()) && rd.getFullYear() === curYear && rd.getMonth() === curMonth;
+      });
+    } else if (window.currentPeriodFilter === 'custom') {
+      const fromVal = document.getElementById('period-from') ? document.getElementById('period-from').value : '';
+      const toVal = document.getElementById('period-to') ? document.getElementById('period-to').value : '';
+      if (fromVal) {
+        const fromD = new Date(fromVal);
+        fromD.setHours(0,0,0,0);
+        filtered = filtered.filter(r => new Date(r.date) >= fromD);
+      }
+      if (toVal) {
+        const toD = new Date(toVal);
+        toD.setHours(23,59,59,999);
+        filtered = filtered.filter(r => new Date(r.date) <= toD);
+      }
+    }
+
+    window.currentRenderedRequests = filtered;
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="text-center py-12 text-stone-400 text-xs"><i class="fa-solid fa-inbox text-3xl mb-2 text-stone-300"></i><p>ไม่พบรายการคำขอในช่วงเวลาหรือสถานะที่เลือก</p></div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    filtered.forEach((r, idx) => {
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-2xl p-4 shadow-sm border border-[#e8decb] space-y-3 transition hover:shadow-md';
+
+      let statusBadge = '<span class="px-2.5 py-0.5 text-[11px] font-bold rounded-lg bg-amber-100 text-amber-800 border border-amber-200"><i class="fa-solid fa-clock mr-1"></i>รอจัดคิว</span>';
+      if (r.status === 'assigned' || r.status === 'approved' || r.status === 'announced') {
+        statusBadge = '<span class="px-2.5 py-0.5 text-[11px] font-bold rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200"><i class="fa-solid fa-circle-check mr-1"></i>จัดคิวแล้ว</span>';
+      } else if (r.status === 'pooled' || (r.status && r.status.includes('รวมคิว'))) {
+        statusBadge = '<span class="px-2.5 py-0.5 text-[11px] font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-200"><i class="fa-solid fa-users mr-1"></i>รวมคิว (Car Pool)</span>';
+      } else if (r.status === 'cancelled' || r.status === 'rejected') {
+        statusBadge = '<span class="px-2.5 py-0.5 text-[11px] font-bold rounded-lg bg-rose-100 text-rose-800 border border-rose-200"><i class="fa-solid fa-ban mr-1"></i>ยกเลิก/ปฏิเสธ</span>';
+      }
+
+      const thaiTime = formatCardTimestamp(r.submittedAtThai || r.submittedAt || r.timestamp);
+      const travelDateStr = r.dateThai || r.travelDate || r.date || '-';
+      const assignedCarStr = r.assignedCar || r.carPlate || '';
+      const assignedDriverStr = r.assignedDriver || r.driverName || '';
+
+      // จัดการรูปภาพที่แนบ
+      let photosHtml = '';
+      if (r.docImgUrl) {
+        const urls = r.docImgUrl.split(',').map(u => u.trim()).filter(Boolean);
+        if (urls.length === 1) {
+          photosHtml = '<a href="' + urls[0] + '" target="_blank" class="px-2.5 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-image"></i> <span>รูปใบใช้รถ</span></a>';
+        } else if (urls.length > 1) {
+          photosHtml = urls.map((u, pIdx) => 
+            '<a href="' + u + '" target="_blank" class="px-2 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded-lg font-semibold transition flex items-center space-x-1 text-[11px]"><i class="fa-solid fa-image"></i> <span>รูปที่ ' + (pIdx + 1) + '</span></a>'
+          ).join(' ');
+        }
+      }
+
+      // ส่วน Car Pool & Dispatch Details
+      let pooledHtml = '';
+      if (r.status === 'pooled' || r.dispatcherNote || assignedCarStr) {
+        pooledHtml = 
+          '<div class="bg-indigo-50/70 rounded-xl p-3 border border-indigo-100 space-y-1.5 text-xs text-indigo-950">' +
+            '<div class="font-bold flex items-center space-x-1.5 text-indigo-800">' +
+              '<i class="fa-solid fa-clipboard-check"></i>' +
+              '<span>ผลการจัดคิวและยานพาหนะ:</span>' +
+            '</div>' +
+            (assignedCarStr ? ('<p>🚗 <strong>รถที่จัดให้:</strong> ' + assignedCarStr + ' (' + (assignedDriverStr || 'ไม่ระบุ') + ')</p>') : '') +
+            (r.dispatcherNote ? ('<div class="mt-1 p-2 bg-white/80 rounded-lg border border-indigo-200 text-indigo-900"><i class="fa-solid fa-comment-dots text-indigo-600 mr-1"></i><strong>ข้อความจากผู้จัดคิว:</strong> ' + r.dispatcherNote + '</div>') : '') +
+          '</div>';
+      }
+
+      card.innerHTML = 
+        '<div class="flex items-center justify-between border-b border-[#f0e8dc] pb-2.5">' +
+          '<div class="flex items-center space-x-2">' +
+            '<span class="font-mono text-xs font-bold text-stone-900 bg-stone-100 px-2 py-0.5 rounded-md">' + r.reqId + '</span>' +
+            statusBadge +
+          '</div>' +
+          '<span class="text-[11px] text-stone-500 font-medium"><i class="fa-regular fa-clock mr-1"></i>' + thaiTime + '</span>' +
+        '</div>' +
+        '<div class="space-y-1.5 text-xs text-stone-700">' +
+          '<p class="flex items-start space-x-1.5"><span class="text-stone-400">📍</span><span><strong>ปลายทาง:</strong> ' + (r.destination || '-') + '</span></p>' +
+          '<p class="flex items-start space-x-1.5"><span class="text-stone-400">🎯</span><span><strong>วัตถุประสงค์:</strong> ' + (r.purpose || '-') + '</span></p>' +
+          '<p class="flex items-start space-x-1.5"><span class="text-stone-400">📅</span><span><strong>วันเวลา:</strong> ' + travelDateStr + ' (' + (r.timeStart || '08.00') + ' - ' + (r.timeEnd || '16.00') + ' น.)</span></p>' +
+          '<p class="flex items-start space-x-1.5"><span class="text-stone-400">👥</span><span><strong>ผู้โดยสาร:</strong> ' + (r.passengersCount || 1) + ' คน</span></p>' +
+        '</div>' +
+        pooledHtml +
+        '<div class="flex items-center justify-between pt-2 border-t border-[#f0e8dc]">' +
+          '<div class="flex items-center space-x-2 flex-wrap gap-y-1">' +
+            '<button onclick="openVoucherPreviewByIndex(' + idx + ')" class="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-print"></i> <span>พิมพ์แบบ ๓</span></button>' +
+            (r.docWordUrl ? ('<a href="' + r.docWordUrl + '" target="_blank" class="px-2 py-1 bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-file-word text-blue-600"></i> <span>Word</span></a>') : '') +
+            (r.docPdfUrl ? ('<a href="' + r.docPdfUrl + '" target="_blank" class="px-2 py-1 bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-file-pdf text-rose-600"></i> <span>PDF</span></a>') : '') +
+            photosHtml +
+          '</div>' +
+          (r.status === 'pending' ? ('<button onclick="openCancelModalByIndex(' + idx + ')" class="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg text-xs font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-ban"></i> <span>ยกเลิกคำขอนี้</span></button>') : '') +
+        '</div>';
+
+      container.appendChild(card);
+    });
+  }
+
+  function openVoucherPreviewByIndex(idx) {
+    const r = window.currentRenderedRequests ? window.currentRenderedRequests[idx] : null;
+    if (r) openVoucherPreview(r);
+  }
+
+  function openCancelModalByIndex(idx) {
+    const r = window.currentRenderedRequests ? window.currentRenderedRequests[idx] : null;
+    if (r) openCancelModal(r);
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // CANCEL REQUEST MODAL & HANDLER
+  // ══════════════════════════════════════════════════════════════
+  function openCancelModal(reqData) {
+    window.currentCancelTarget = reqData;
+
+    const elId = document.getElementById('cancel-card-id');
+    const elDate = document.getElementById('cancel-card-date');
+    const elDest = document.getElementById('cancel-card-dest');
+    const elRequester = document.getElementById('cancel-card-requester');
+    const elReason = document.getElementById('cancel-input-reason');
+
+    if (elId) elId.textContent = reqData.reqId || '-';
+    if (elDate) elDate.textContent = (reqData.dateThai || reqData.travelDate || reqData.date || '-') + ' (' + (reqData.timeStart || '08.00') + ' - ' + (reqData.timeEnd || '16.00') + ' น.)';
+    if (elDest) elDest.textContent = reqData.destination || '-';
+    if (elRequester) elRequester.textContent = reqData.requesterName || (currentUser ? currentUser.name : '-');
+    if (elReason) elReason.value = '';
+
+    openModal('modal-cancel-confirm');
+  }
+
+  function executeCancelMyRequest() {
+    if (!window.currentCancelTarget) return;
+    const r = window.currentCancelTarget;
+    const reqId = r.reqId;
+    const reason = document.getElementById('cancel-input-reason') ? document.getElementById('cancel-input-reason').value.trim() : '';
+
+    const btn = document.getElementById('btn-confirm-cancel');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังยกเลิก...';
+    }
+
+    const uid = (currentUser && currentUser.userId) ? currentUser.userId : (localStorage.getItem('user_line_id') || '');
+    const uName = (currentUser && currentUser.name) ? currentUser.name : (localStorage.getItem('user_full_name') || '');
+    const isAdmin = (currentUser && currentUser.roleKey === 'admin');
+
+    callBackend('apiCancelMyRequest', {
+      reqId: reqId,
+      userId: uid,
+      requesterName: uName,
+      reason: reason,
+      isAdmin: isAdmin
+    }, res => {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-trash-can"></i> <span>ยืนยันยกเลิกคำขอ</span>';
+      }
+      closeModal('modal-cancel-confirm');
+
+      if (res && res.success) {
+        showToast('ยกเลิกคำขอใช้รถเรียบร้อยแล้ว', 'success');
+        loadMyRequests();
+      } else {
+        showToast(res ? res.message : 'ไม่สามารถยกเลิกคำขอได้', 'error');
+      }
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // OFFICIAL FORM 3 VOUCHER PREVIEW & PRINT
+  // ══════════════════════════════════════════════════════════════
+  function openVoucherPreview(r) {
+    const dStr = r.date || getTodayDateStr();
+    const dParts = dStr.split('-');
+    const day = dParts[2] ? parseInt(dParts[2], 10) : new Date().getDate();
+    const month = dParts[1] ? parseInt(dParts[1], 10) : (new Date().getMonth() + 1);
+    const year = dParts[0] ? (parseInt(dParts[0], 10) + 543) : (new Date().getFullYear() + 543);
+    const thaiMonths = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+    const monthName = thaiMonths[month] || '';
+    const dateFullThai = day + ' ' + monthName + ' ' + year;
+
+    document.getElementById('vouch-day').textContent = String(day);
+    document.getElementById('vouch-month').textContent = monthName;
+    document.getElementById('vouch-year').textContent = String(year);
+    document.getElementById('vouch-name').textContent = r.requesterName || (currentUser ? currentUser.name : '');
+    document.getElementById('vouch-pos').textContent = r.position || r.requesterPos || (currentUser ? currentUser.position : 'เจ้าหน้าที่');
+    document.getElementById('vouch-dest').textContent = r.destination || '-';
+    document.getElementById('vouch-purpose').textContent = r.purpose || '-';
+    document.getElementById('vouch-passengers').textContent = String(r.passengersCount || r.passengers || 1);
+    
+    document.getElementById('vouch-start-date').textContent = dateFullThai;
+    document.getElementById('vouch-start-time').textContent = r.timeStart || '08.00';
+    document.getElementById('vouch-end-date').textContent = dateFullThai;
+    document.getElementById('vouch-end-time').textContent = r.timeEnd || '16.00';
+
+    // ผู้ขออนุญาต
+    document.getElementById('vouch-req-name').textContent = r.requesterName || (currentUser ? currentUser.name : '');
+
+    // หัวหน้าฝ่าย
+    const headName = r.signatoryName || 'นางสาวภริตพร  หมื่นสม';
+    document.getElementById('vouch-head-name').textContent = headName;
+
+    // ผู้มีอำนาจสั่งใช้รถ (ตรวจสอบในเวลา/นอกเวลา)
+    const isAfterHours = (r.timeStart < '08.00' || r.timeEnd > '16.00');
+    if (isAfterHours) {
+      document.getElementById('vouch-approver-name').textContent = 'นายบำรุง  สำเนียงงาม';
+      document.getElementById('vouch-approver-pos1').textContent = 'ผู้อำนวยการเขตคลองเตย ปฏิบัติราชการแทน';
+      document.getElementById('vouch-approver-pos2').textContent = 'ปลัดกรุงเทพมหานคร';
+    } else {
+      document.getElementById('vouch-approver-name').textContent = headName;
+      document.getElementById('vouch-approver-pos1').textContent = 'นักพัฒนาสังคมชำนาญการพิเศษ';
+      document.getElementById('vouch-approver-pos2').textContent = 'หัวหน้าฝ่ายพัฒนาชุมชนและสวัสดิการสังคม สำนักงานเขตคลองเตย';
+    }
+
+    openModal('modal-voucher-preview');
+  }
+
+  function printVoucherContent() {
+    window.print();
   }
 
   // ══════════════════════════════════════════════════════════════
