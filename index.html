@@ -7,10 +7,10 @@
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ระบบบริหารจัดการยานพาหนะ ฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย</title>
-  <!-- Google Fonts: Prompt & Kanit -->
+  <!-- Google Fonts: Prompt, Kanit & Sarabun (สำหรับพิมพ์ใบขอใช้รถราชการ แบบ 3) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Kanit:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -62,36 +62,73 @@
       font-family: 'Prompt', sans-serif;
     }
   
+    @page {
+      size: A4 portrait;
+      margin: 10mm 15mm 10mm 15mm;
+    }
+
     @media print {
-      body {
-        background-color: white !important;
-        color: black !important;
+      html, body {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        overflow: hidden !important;
+        margin: 0 !important;
         padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
-      body * {
-        visibility: hidden;
+      
+      /* ซ่อนองค์ประกอบอื่นทั้งหมด ให้เหลือเฉพาะ Modal ตัวอย่างพิมพ์ */
+      body > *:not(#modal-voucher-preview) {
+        display: none !important;
       }
-      #modal-voucher-preview, #modal-voucher-preview * {
-        visibility: visible;
-      }
+      
       #modal-voucher-preview {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+      }
+
+      #modal-voucher-preview > div {
+        max-width: 100% !important;
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        background: white !important;
-      }
-      #printable-voucher {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
         border: none !important;
         box-shadow: none !important;
-        padding: 10mm 15mm !important;
+        background: transparent !important;
       }
+
+      #modal-voucher-preview .print\:hidden,
+      #modal-voucher-preview button,
+      #modal-voucher-preview .modal-header {
+        display: none !important;
+      }
+
+      #printable-voucher {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        font-family: 'TH SarabunPSK', 'Sarabun', 'TH Sarabun New', 'Angsana New', sans-serif !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+
       .print\:hidden {
         display: none !important;
       }
@@ -112,7 +149,7 @@
         <div>
           <div class="flex items-center space-x-1.5">
             <h1 class="text-sm font-bold text-stone-900 font-heading leading-tight">ฝ่ายพัฒนาชุมชนฯ</h1>
-            <span class="px-1.5 py-0.2 text-[9px] font-semibold bg-[#ece3d4] text-stone-700 rounded-md">One Stop Service</span>
+            <span class="px-1.5 py-0.2 text-[9px] font-semibold bg-emerald-100 text-emerald-800 rounded-md" title="เวอร์ชันล่าสุด แบบ 3 ตรง 100%">v3.4 (แบบ 3 ล่าสุด)</span>
           </div>
           <p class="text-[10px] text-stone-500">สำนักงานเขตคลองเตย</p>
         </div>
@@ -1579,30 +1616,36 @@
   </div>
 
   <!-- MODAL: พิมพ์ใบขอใช้รถราชการ (แบบ ๓) ย้อนหลัง (เหมือนต้นฉบับ 100%) -->
-    <!-- Modal แสดงตัวอย่างและสั่งพิมพ์ใบขอใช้รถ (แบบ ๓) ราชการ 1 หน้าพอดี 100% -->
-    <!-- Modal แสดงตัวอย่างและสั่งพิมพ์ใบขอใช้รถ (แบบ ๓) ราชการ 1 หน้าพอดี 100% -->
   <div id="modal-voucher-preview" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm hidden flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl max-w-2xl w-full p-4 sm:p-6 shadow-2xl space-y-4 border border-[#e8decb] my-auto">
-      <div class="flex items-center justify-between border-b border-[#f0e8dc] pb-2 print:hidden">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl space-y-4 border border-[#e8decb] my-auto">
+      <div class="flex items-center justify-between border-b border-[#f0e8dc] pb-2 print:hidden gap-2">
         <div class="flex items-center space-x-2">
           <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs">
             <i class="fa-solid fa-print"></i>
           </span>
           <h3 class="text-sm font-bold text-stone-900 font-heading">ตัวอย่างพิมพ์ใบขออนุญาตใช้รถส่วนกลาง (แบบ ๓)</h3>
         </div>
-        <div class="flex items-center space-x-2">
-          <button onclick="printVoucherContent()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm">
+        <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+          <button onclick="printVoucherContent()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 shadow-sm active:scale-95">
             <i class="fa-solid fa-print"></i>
-            <span>สั่งพิมพ์ / บันทึก PDF</span>
+            <span>สั่งพิมพ์ (1 หน้า A4)</span>
           </button>
-          <button onclick="closeModal('modal-voucher-preview')" class="text-stone-400 hover:text-stone-600 p-1">
-            <i class="fa-solid fa-xmark"></i>
+          <button id="vouch-btn-word" onclick="downloadVoucherWord()" class="px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 active:scale-95">
+            <i class="fa-solid fa-file-word text-blue-600"></i>
+            <span>ดาวน์โหลด Word (.docx)</span>
+          </button>
+          <button id="vouch-btn-pdf" onclick="downloadVoucherPdf()" class="px-3 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold rounded-xl transition flex items-center space-x-1.5 active:scale-95">
+            <i class="fa-solid fa-file-pdf text-rose-600"></i>
+            <span>ดาวน์โหลด PDF</span>
+          </button>
+          <button onclick="closeModal('modal-voucher-preview')" class="text-stone-400 hover:text-stone-600 p-1.5 rounded-lg hover:bg-stone-100 transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
           </button>
         </div>
       </div>
 
       <!-- Printable Voucher Content: ถอดแบบตรงตาม ใบขอใช้รถ_แบบ3_แม่แบบวันทำการ_หนฝ่ายอนุมัติ.docx 100% -->
-      <div id="printable-voucher" class="bg-white text-black p-4 sm:p-6 border border-stone-300 rounded-lg text-[13pt] leading-snug font-serif" style="font-family: 'TH SarabunPSK', 'Sarabun', sans-serif;">
+      <div id="printable-voucher" class="bg-white text-black p-4 sm:p-6 border border-stone-300 rounded-lg text-[13pt] leading-normal font-serif select-none" style="font-family: 'TH SarabunPSK', 'Sarabun', 'Angsana New', sans-serif;">
         <div class="text-right text-xs font-semibold">แบบ 3</div>
         <div class="text-center font-bold text-lg my-1">ใบขออนุญาตใช้รถส่วนกลาง</div>
         <div class="text-right text-xs my-1 flex justify-end items-end gap-1">
@@ -1648,20 +1691,20 @@
         </div>
 
         <!-- ผู้ขออนุญาต (4 บรรทัดตามภาพจริง) -->
-        <div class="w-80 ml-auto text-center text-xs mt-3 space-y-0.5">
-          <p>(ลงชื่อ) ............................................ ผู้ขออนุญาต</p>
-          <p>(<span id="vouch-req-name" class="font-semibold"></span>)</p>
-          <p id="vouch-req-pos" class="text-[11px]"></p>
-          <p class="text-[10px]">ฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย</p>
+        <div class="w-[320px] ml-auto text-center text-xs mt-3 space-y-0.5">
+          <p class="whitespace-nowrap">(ลงชื่อ) ............................................ ผู้ขออนุญาต</p>
+          <p class="whitespace-nowrap">(<span id="vouch-req-name" class="font-semibold"></span>)</p>
+          <p id="vouch-req-pos" class="text-[11px] whitespace-nowrap"></p>
+          <p class="text-[10px] whitespace-nowrap">ฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย</p>
         </div>
 
         <!-- หัวหน้าฝ่าย -->
-        <div class="w-80 ml-auto text-center text-xs mt-2 space-y-0.5">
-          <p>(ลงชื่อ) ............................................ หัวหน้าฝ่าย</p>
-          <p>(<span id="vouch-head-name" class="font-semibold">นางสาวภริตพร  หมื่นสม</span>)</p>
-          <p class="text-[11px]">นักพัฒนาสังคมชำนาญการพิเศษ</p>
-          <p class="text-[10px]">หัวหน้าฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย</p>
-          <p>วันที่..................................................</p>
+        <div class="w-[320px] ml-auto text-center text-xs mt-2 space-y-0.5">
+          <p class="whitespace-nowrap">(ลงชื่อ) ............................................ หัวหน้าฝ่าย</p>
+          <p class="whitespace-nowrap">(<span id="vouch-head-name" class="font-semibold">นางสาวภริตพร  หมื่นสม</span>)</p>
+          <p class="text-[11px] whitespace-nowrap">นักพัฒนาสังคมชำนาญการพิเศษ</p>
+          <p class="text-[10px] whitespace-nowrap">หัวหน้าฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย</p>
+          <p class="whitespace-nowrap">วันที่..................................................</p>
         </div>
 
         <!-- คำสั่งอนุญาต -->
@@ -1670,12 +1713,12 @@
         </div>
 
         <!-- ผู้มีอำนาจสั่งใช้รถ -->
-        <div class="w-80 ml-auto text-center text-xs mt-1 space-y-0.5">
+        <div class="w-[320px] ml-auto text-center text-xs mt-1 space-y-0.5">
           <p class="whitespace-nowrap">(ลงชื่อ).........................................................ผู้มีอำนาจสั่งใช้รถ</p>
-          <p>(<span id="vouch-approver-name" class="font-semibold">นางสาวภริตพร  หมื่นสม</span>)</p>
-          <p id="vouch-approver-pos1" class="text-[11px]">นักพัฒนาสังคมชำนาญการพิเศษ</p>
-          <p id="vouch-approver-pos2" class="text-[10px]">หัวหน้าฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย</p>
-          <p>วันที่..................................................</p>
+          <p class="whitespace-nowrap">(<span id="vouch-approver-name" class="font-semibold">นางสาวภริตพร  หมื่นสม</span>)</p>
+          <p id="vouch-approver-pos1" class="text-[11px] whitespace-nowrap">นักพัฒนาสังคมชำนาญการพิเศษ</p>
+          <p id="vouch-approver-pos2" class="text-[10px] whitespace-nowrap">หัวหน้าฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย</p>
+          <p class="whitespace-nowrap">วันที่..................................................</p>
         </div>
 
         <!-- กรอบบันทึก พขร. ด้านล่าง (ตารางสี่เหลี่ยมตามแม่แบบราชการ) -->
@@ -3623,8 +3666,8 @@
         '<div class="flex items-center justify-between pt-2 border-t border-[#f0e8dc]">' +
           '<div class="flex items-center space-x-2 flex-wrap gap-y-1">' +
             '<button onclick="openVoucherPreviewByIndex(' + idx + ')" class="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-print"></i> <span>พิมพ์แบบ ๓</span></button>' +
-            (r.docWordUrl ? ('<a href="' + r.docWordUrl + '" target="_blank" class="px-2 py-1 bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-file-word text-blue-600"></i> <span>Word</span></a>') : '') +
-            (r.docPdfUrl ? ('<a href="' + r.docPdfUrl + '" target="_blank" class="px-2 py-1 bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-file-pdf text-rose-600"></i> <span>PDF</span></a>') : '') +
+            (r.docWordUrl ? ('<a href="' + r.docWordUrl + '" target="_blank" class="px-2 py-1 bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-file-word text-blue-600"></i> <span>Word</span></a>') : ('<button onclick="downloadWordByIndex(' + idx + ')" class="px-2 py-1 bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-file-word text-blue-600"></i> <span>Word</span></button>')) +
+            (r.docPdfUrl ? ('<a href="' + r.docPdfUrl + '" target="_blank" class="px-2 py-1 bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-file-pdf text-rose-600"></i> <span>PDF</span></a>') : ('<button onclick="downloadPdfByIndex(' + idx + ')" class="px-2 py-1 bg-stone-100 text-stone-700 hover:bg-stone-200 rounded-lg font-semibold transition flex items-center space-x-1 text-xs"><i class="fa-solid fa-file-pdf text-rose-600"></i> <span>PDF</span></button>')) +
             photosHtml +
           '</div>' +
           (r.status === 'pending' ? ('<button onclick="openCancelModalByIndex(' + idx + ')" class="px-2.5 py-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg text-xs font-semibold transition flex items-center space-x-1"><i class="fa-solid fa-ban"></i> <span>ยกเลิกคำขอนี้</span></button>') : '') +
@@ -3637,6 +3680,22 @@
   function openVoucherPreviewByIndex(idx) {
     const r = window.currentRenderedRequests ? window.currentRenderedRequests[idx] : null;
     if (r) openVoucherPreview(r);
+  }
+
+  function downloadWordByIndex(idx) {
+    const r = window.currentRenderedRequests ? window.currentRenderedRequests[idx] : null;
+    if (r) {
+      currentPreviewRequest = r;
+      downloadVoucherWord();
+    }
+  }
+
+  function downloadPdfByIndex(idx) {
+    const r = window.currentRenderedRequests ? window.currentRenderedRequests[idx] : null;
+    if (r) {
+      currentPreviewRequest = r;
+      downloadVoucherPdf();
+    }
   }
 
   function openCancelModalByIndex(idx) {
@@ -3706,7 +3765,10 @@
   // ══════════════════════════════════════════════════════════════
   // OFFICIAL FORM 3 VOUCHER PREVIEW & PRINT
   // ══════════════════════════════════════════════════════════════
+  let currentPreviewRequest = null;
+
   function openVoucherPreview(r) {
+    currentPreviewRequest = r;
     const dStr = r.date || getTodayDateStr();
     const dParts = dStr.split('-');
     const day = dParts[2] ? parseInt(dParts[2], 10) : new Date().getDate();
@@ -3751,7 +3813,76 @@
       document.getElementById('vouch-approver-pos2').textContent = 'หัวหน้าฝ่ายพัฒนาชุมชนฯ สำนักงานเขตคลองเตย';
     }
 
+    // อัปเดตปุ่มดาวน์โหลด Word / PDF ใน Modal
+    const btnWord = document.getElementById('vouch-btn-word');
+    const btnPdf = document.getElementById('vouch-btn-pdf');
+    if (btnWord) {
+      btnWord.title = r.docWordUrl ? 'เปิดไฟล์ Word ที่สร้างไว้แล้ว' : 'สร้างไฟล์ Word (.docx) มาตรฐานราชการ';
+    }
+    if (btnPdf) {
+      btnPdf.title = r.docPdfUrl ? 'เปิดไฟล์ PDF ที่สร้างไว้แล้ว' : 'สร้างไฟล์ PDF มาตรฐานราชการ';
+    }
+
     openModal('modal-voucher-preview');
+  }
+
+  function downloadVoucherWord() {
+    if (!currentPreviewRequest) return;
+    if (currentPreviewRequest.docWordUrl) {
+      let url = currentPreviewRequest.docWordUrl;
+      if (url.includes('drive.google.com/file/d/')) {
+        const fileId = url.split('/file/d/')[1].split('/')[0];
+        url = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      }
+      window.open(url, '_blank');
+      return;
+    }
+    generateDocAndOpen(currentPreviewRequest, 'word');
+  }
+
+  function downloadVoucherPdf() {
+    if (!currentPreviewRequest) return;
+    if (currentPreviewRequest.docPdfUrl) {
+      let url = currentPreviewRequest.docPdfUrl;
+      if (url.includes('drive.google.com/file/d/')) {
+        const fileId = url.split('/file/d/')[1].split('/')[0];
+        url = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      }
+      window.open(url, '_blank');
+      return;
+    }
+    generateDocAndOpen(currentPreviewRequest, 'pdf');
+  }
+
+  function generateDocAndOpen(r, targetType) {
+    showToast('กำลังจัดทำเอกสารแบบราชการ 100%...', 'info');
+    callGas('apiGenerateVoucherDoc', {
+      reqId: r.reqId,
+      requesterName: r.requesterName || (currentUser ? currentUser.name : ''),
+      position: r.position || r.requesterPos || (currentUser ? currentUser.position : ''),
+      destination: r.destination,
+      purpose: r.purpose,
+      passengers: r.passengersCount || r.passengers || 1,
+      date: r.date,
+      timeStart: r.timeStart,
+      timeEnd: r.timeEnd,
+      signatoryName: r.signatoryName
+    }, res => {
+      if (res && res.success) {
+        if (res.docxUrl) r.docWordUrl = res.docxUrl;
+        if (res.pdfUrl) r.docPdfUrl = res.pdfUrl;
+        const targetUrl = targetType === 'word' ? (res.docxUrl || res.pdfUrl) : (res.pdfUrl || res.docxUrl);
+        if (targetUrl) {
+          window.open(targetUrl, '_blank');
+          showToast('จัดทำเอกสารสำเร็จ กำลังเปิดไฟล์...', 'success');
+          if (typeof loadMyRequests === 'function') loadMyRequests();
+        } else {
+          showToast('สร้างเอกสารสำเร็จ แต่ไม่พบลิงก์ไฟล์', 'warning');
+        }
+      } else {
+        showToast(res ? res.message : 'ไม่สามารถสร้างเอกสารได้', 'error');
+      }
+    });
   }
 
   function printVoucherContent() {
